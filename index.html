@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XAYTHEON - Collaborative Innovation Platform</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet" />
     <!-- Supabase SDK & auth bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
     <script defer src="auth.js"></script>
 </head>
+
 <body>
     <!-- 3D Background Canvas -->
     <div class="canvas-container">
         <canvas id="three-canvas"></canvas>
-        
+
         <!-- Loading Screen -->
         <div id="loading-screen" class="loading-screen">
             <div class="loader"></div>
@@ -43,21 +46,24 @@
                     <li><a class="nav-link" href="contributions.html">Contributions</a></li>
                     <li>
                         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
-                            <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="5"/>
-                                <line x1="12" y1="1" x2="12" y2="3"/>
-                                <line x1="12" y1="21" x2="12" y2="23"/>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                                <line x1="1" y1="12" x2="3" y2="12"/>
-                                <line x1="21" y1="12" x2="23" y2="12"/>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                            <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                             </svg>
                         </button>
                     </li>
                     <li id="auth-area"></li>
                 </ul>
+                <i class="ri-menu-2-line menu-icon"></i>
+                <i class="ri-close-large-fill menu-close-icon"></i>
             </div>
         </nav>
 
@@ -68,24 +74,27 @@
                     <h1 class="hero-title">
                         <span class="title-line">Welcome to</span>
                         <span class="title-main title-main--logo">
-                            <img src="assets/logo/thelogo.png" onerror="this.onerror=null;this.src='assets/logo/thelogo.png'" alt="XAYTHEON" class="title-logo-img" />
+                            <img src="assets/logo/thelogo.png"
+                                onerror="this.onerror=null;this.src='assets/logo/thelogo.png'" alt="XAYTHEON"
+                                class="title-logo-img" />
                         </span>
-                        <span class="title-subtitle">Where <span class="accent-glow">INNOVATION</span> Meets <span class="accent-glow">COLLAB</span>ORATION</span>
+                        <span class="title-subtitle">Where <span class="accent-glow">INNOVATION</span> Meets <span
+                                class="accent-glow">COLLAB</span>ORATION</span>
                     </h1>
                 </div>
             </section>
 
 
-        <div class="cursor-container">
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-        </div>
+            <div class="cursor-container">
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+            </div>
 
 
 
@@ -123,4 +132,5 @@
     <!-- Our custom script -->
     <script src="script.js"></script>
 </body>
+
 </html>
