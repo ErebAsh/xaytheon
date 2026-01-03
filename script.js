@@ -631,12 +631,8 @@ function initGithubDashboard() {
   const usernameInput = document.getElementById("gh-username");
   const clearBtn = document.getElementById("gh-clear");
   const status = document.getElementById("github-status");
-
-    const usernameInput = document.getElementById('gh-username');
-    const clearBtn = document.getElementById('gh-clear');
-    const status = document.getElementById('github-status');
-    usernameInput.addEventListener('input', () => {
-    setStatus('');
+  usernameInput.addEventListener('input', () => {
+  setStatus('');
 });
 
 
@@ -1252,4 +1248,5 @@ window.addEventListener("resize", () => {
     }
   }
 });
+
 
