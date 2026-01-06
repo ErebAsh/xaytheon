@@ -25,7 +25,7 @@ function getCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax", // Changed from strict to lax for better compat
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 }
@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.createUser(email, hashedPassword);
-    
+
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     console.error("Registration error:", err);
@@ -74,9 +74,11 @@ exports.login = async (req, res) => {
     await User.updateRefreshToken(user.id, refreshToken);
     res.cookie("refreshToken", refreshToken, getCookieOptions());
 
-    res.json({ 
+    res.json({
       accessToken,
-      expiresIn: 15 * 60, // 15 minutes in seconds
+      refreshToken, // Return in body for localStorage fallback
+      user: { id: user.id, email: user.email },
+      expiresIn: 15 * 60,
       message: "Login successful"
     });
   } catch (err) {
@@ -87,7 +89,8 @@ exports.login = async (req, res) => {
 
 exports.refresh = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies;
+    // Try cookie first, then body (for non-cookie envs like file://)
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ message: "Refresh token not found" });
@@ -110,8 +113,10 @@ exports.refresh = async (req, res) => {
     const tokens = generateTokens(user.id);
     await User.updateRefreshToken(user.id, tokens.refreshToken);
     res.cookie("refreshToken", tokens.refreshToken, getCookieOptions());
-    res.json({ 
+    res.json({
       accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken, // Return new refresh token
+      user: { id: user.id, email: user.email },
       expiresIn: 15 * 60,
       message: "Token refreshed successfully"
     });
@@ -145,8 +150,8 @@ exports.logout = async (req, res) => {
 };
 
 exports.verifyToken = async (req, res) => {
-  res.json({ 
-    valid: true, 
+  res.json({
+    valid: true,
     userId: req.userId,
     message: "Token is valid"
   });

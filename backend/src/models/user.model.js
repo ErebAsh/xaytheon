@@ -47,3 +47,15 @@ exports.updateRefreshToken = (userId, refreshToken) =>
       }
     );
   });
+
+exports.updateViewHistory = (userId, historyJson) =>
+  new Promise((resolve, reject) => {
+    db.run(
+      "UPDATE users SET view_history = ? WHERE id = ?",
+      [historyJson, userId],
+      function (err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      }
+    );
+  });

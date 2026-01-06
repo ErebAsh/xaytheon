@@ -26,8 +26,9 @@ db.serialize(() => {
     const hasRefreshToken = columnNames.includes("refresh_token");
     const hasCreatedAt = columnNames.includes("created_at");
     const hasUpdatedAt = columnNames.includes("updated_at");
+    const hasViewHistory = columnNames.includes("view_history");
 
-    if (hasRefreshToken && hasCreatedAt && hasUpdatedAt) {
+    if (hasRefreshToken && hasCreatedAt && hasUpdatedAt && hasViewHistory) {
       console.log("✅ Database is already up to date!");
       db.close();
       return;
@@ -45,6 +46,20 @@ db.serialize(() => {
             console.error("❌ Error adding refresh_token column:", err);
           } else {
             console.log("✅ Added refresh_token column");
+          }
+        }
+      );
+    }
+
+    // Add view_history column
+    if (!hasViewHistory) {
+      db.run(
+        "ALTER TABLE users ADD COLUMN view_history TEXT DEFAULT '[]'",
+        (err) => {
+          if (err) {
+            console.error("❌ Error adding view_history column:", err);
+          } else {
+            console.log("✅ Added view_history column");
           }
         }
       );

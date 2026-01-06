@@ -19,10 +19,10 @@
 
   //Active view button 
   function setActive(btn) {
-  document.querySelectorAll(".view-toggle .btn")
-    .forEach(b => b.classList.remove("btn-primary"));
-  btn.classList.add("btn-primary");
-}
+    document.querySelectorAll(".view-toggle .btn")
+      .forEach(b => b.classList.remove("btn-primary"));
+    btn.classList.add("btn-primary");
+  }
 
   document.getElementById("view-graph-btn")?.addEventListener("click", () => {
     graphView.style.display = "block";
@@ -100,9 +100,15 @@
     repos.forEach(repo => {
       const tr = document.createElement("tr");
 
+      const safeRepo = JSON.stringify({
+        full_name: repo.full_name,
+        language: repo.language,
+        html_url: repo.html_url
+      }).replace(/"/g, "&quot;");
+
       tr.innerHTML = `
         <td>
-          <a href="${repo.html_url}" target="_blank" rel="noopener">
+          <a href="${repo.html_url}" target="_blank" rel="noopener" onclick='window.trackRepoView && window.trackRepoView(${safeRepo})'>
             ${repo.full_name}
           </a>
         </td>
@@ -164,6 +170,9 @@
 
   async function onNodeClick(event, d) {
     if (d.type === "repo") {
+      if (window.trackRepoView) {
+        window.trackRepoView({ full_name: d.label, html_url: d.url });
+      }
       window.open(d.url, "_blank");
       return;
     }
@@ -199,6 +208,9 @@
     addNode(`topic:${base}`, { type: "topic", label: base });
 
     try {
+      if (window.trackSearchInterest) {
+        window.trackSearchInterest(base, lang);
+      }
       setStatus("Loading repositories…");
       const repos = await searchReposByTopic(base, lang, limit);
 

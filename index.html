@@ -78,8 +78,7 @@
 
                         <span class="title-main title-main--logo">
                             <img src="assets/logo/thelogo.png"
-                                onerror="this.onerror=null;this.src='assets/logo/thelogo.png'"
-                                alt="XAYTHEON"
+                                onerror="this.onerror=null;this.src='assets/logo/thelogo.png'" alt="XAYTHEON"
                                 class="title-logo-img" />
                         </span>
 
@@ -105,8 +104,20 @@
 
             <!-- Gated content placeholder -->
             <section data-requires-auth style="display:none; padding-top:0;">
-                <div class="container" style="text-align:center; margin-top:-40px;">
-                    <div class="muted">You are signed in. Future advanced features will appear here.</div>
+                <div class="container">
+                    <div id="recommendations-area" class="hidden">
+                        <h2 class="section-title">Recommended for You</h2>
+                        <p class="section-subtitle">Based on your viewing history</p>
+                        <div id="rec-list" class="grid-3">
+                            <!-- Recommendations will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="empty-rec-state hidden" id="rec-empty">
+                        <div class="muted" style="margin-top:20px;">
+                            Start exploring repositories to get personalized recommendations!
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -120,17 +131,17 @@
                         <p>Empowering the next generation of innovators</p>
                     </div>
                     <div class="footer-socials">
-                     <a href="https://github.com/Saatvik-GT/xaytheon" target="_blank" aria-label="GitHub">
-                        <i class="ri-github-fill"></i>
-                    </a>
-                     <a href="https://www.linkedin.com/in/saatviksawarn/" target="_blank" aria-label="LinkedIn">
-                        <i class="ri-linkedin-fill"></i>
-                    </a>
-                    <a href="https://x.com/SaatvikSawarn" target="_blank" aria-label="Twitter">
-                        <i class="ri-twitter-x-fill"></i>
-                    </a>
-                </a>
-            </div>
+                        <a href="https://github.com/Saatvik-GT/xaytheon" target="_blank" aria-label="GitHub">
+                            <i class="ri-github-fill"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/saatviksawarn/" target="_blank" aria-label="LinkedIn">
+                            <i class="ri-linkedin-fill"></i>
+                        </a>
+                        <a href="https://x.com/SaatvikSawarn" target="_blank" aria-label="Twitter">
+                            <i class="ri-twitter-x-fill"></i>
+                        </a>
+                        </a>
+                    </div>
                     <span class="footer-label">XAYTHEON</span>
                 </div>
                 <div class="footer-bottom">
@@ -151,5 +162,3 @@
 </body>
 
 </html>
-
-
