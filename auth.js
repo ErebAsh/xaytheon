@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE_URL = window.location.protocol === "https:" 
+  const API_BASE_URL = window.location.protocol === "https:"
     ? "https://your-api-domain.com/api/auth"
     : "http://localhost:5000/api/auth";
 
@@ -26,22 +26,36 @@
   }
 
   let accessToken = null;
+  let currentUser = null;
   let tokenExpiryTime = null;
   let refreshTimer = null;
 
-  function setAccessToken(token, expiresIn) {
+  function setAccessToken(token, expiresIn, user) {
     accessToken = token;
+    if (user) currentUser = user;
     tokenExpiryTime = Date.now() + (expiresIn - 60) * 1000;
     scheduleTokenRefresh();
+    window.dispatchEvent(new CustomEvent('xaytheon:authchange', { detail: { user: currentUser } }));
+  }
+
+  async function getSession() {
+    if (!accessToken) return null;
+    return {
+      access_token: accessToken,
+      user: currentUser
+    };
   }
 
   function clearAccessToken() {
     accessToken = null;
+    currentUser = null;
     tokenExpiryTime = null;
+    localStorage.removeItem("x_refresh_token"); // Clear persistence
     if (refreshTimer) {
       clearTimeout(refreshTimer);
       refreshTimer = null;
     }
+    window.dispatchEvent(new CustomEvent('xaytheon:authchange', { detail: { user: null } }));
   }
 
   function getAccessToken() {
@@ -55,31 +69,55 @@
 
   async function refreshAccessToken() {
     try {
-      const res = await fetchWithTimeout(`${API_BASE_URL}/refresh`, {
+      const storedRefreshToken = localStorage.getItem("x_refresh_token");
+      const isFileProtocol = window.location.protocol === 'file:';
+
+      const options = {
         method: "POST",
-        credentials: "include", // Send httpOnly cookies
-        headers: { "Content-Type": "application/json" },
-      });
+        headers: { "Content-Type": "application/json" }
+      };
+
+      if (storedRefreshToken) {
+        options.body = JSON.stringify({ refreshToken: storedRefreshToken });
+        // On file protocol, avoiding credentials helps avoid some CORS/cookie strictness
+        // On http/https, we can include them, but it's not strictly necessary if body has token
+      } else {
+        options.credentials = "include";
+      }
+
+      const res = await fetchWithTimeout(`${API_BASE_URL}/refresh`, options);
 
       if (!res.ok) {
-        throw new Error("Token refresh failed");
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.message || "Token refresh failed");
       }
 
       const data = await res.json();
-      setAccessToken(data.accessToken, data.expiresIn);
+      setAccessToken(data.accessToken, data.expiresIn, data.user);
+
+      if (data.refreshToken) {
+        localStorage.setItem("x_refresh_token", data.refreshToken);
+      }
+
       return true;
     } catch (err) {
-      console.error("Token refresh error:", err);
-      clearAccessToken();
-      renderAuthArea();
-      applyAuthGating();
+      console.warn("Session restore failed:", err);
+      if (!err.message.includes("Network")) {
+        // If the token is definitely invalid (401 from backend), clear it.
+        // If it's a network error (server down), keep it to try again later.
+        if (err.message.includes("Invalid") || err.message.includes("expired") || err.message.includes("not found")) {
+          clearAccessToken();
+          renderAuthArea();
+          applyAuthGating();
+        }
+      }
       return false;
     }
   }
 
   function scheduleTokenRefresh() {
     if (refreshTimer) clearTimeout(refreshTimer);
-    
+
     if (!tokenExpiryTime) return;
 
     const timeUntilRefresh = tokenExpiryTime - Date.now();
@@ -148,7 +186,12 @@
       }
 
       const data = await res.json();
-      setAccessToken(data.accessToken, data.expiresIn);
+      setAccessToken(data.accessToken, data.expiresIn, data.user);
+
+      if (data.refreshToken) {
+        localStorage.setItem("x_refresh_token", data.refreshToken);
+      }
+
       renderAuthArea();
       applyAuthGating();
     } catch (err) {
@@ -200,13 +243,18 @@
     clearAccessToken();
     renderAuthArea();
     applyAuthGating();
+    // Force reload to clear any private state
+    window.location.reload();
   }
 
   async function restoreSession() {
-    try {
-      await refreshAccessToken();
-    } catch (err) {
-      console.log("No existing session");
+    // If we have a stored refresh token, try to use it
+    if (localStorage.getItem("x_refresh_token")) {
+      try {
+        await refreshAccessToken();
+      } catch (err) {
+        console.log("No existing session restored");
+      }
     }
   }
 
@@ -256,9 +304,9 @@
   }
 
   function enforceHttps() {
-    if (window.location.protocol !== "https:" && 
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1") {
+    if (window.location.protocol !== "https:" &&
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1") {
       // In production, redirect to HTTPS
       if (process.env.NODE_ENV === "production") {
         window.location.protocol = "https:";
@@ -270,11 +318,13 @@
 
   window.XAYTHEON_AUTH = {
     login,
-    register,   
+    register,
     logout,
     isAuthenticated,
     authenticatedFetch,
     refreshAccessToken,
+    getSession,
+    ensureClient: () => null
   };
 
   window.addEventListener("DOMContentLoaded", async () => {

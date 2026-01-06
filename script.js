@@ -694,8 +694,8 @@ function initGithubDashboard() {
   const clearBtn = document.getElementById("gh-clear");
   const status = document.getElementById("github-status");
   usernameInput.addEventListener('input', () => {
-  setStatus('');
-});
+    setStatus('');
+  });
 
 
 
@@ -708,7 +708,7 @@ function initGithubDashboard() {
       usernameInput.value = saved.username;
       loadGithubDashboard(saved.username);
     }
-  } catch {}
+  } catch { }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -894,19 +894,23 @@ function renderRepos(repos) {
     return;
   }
   list.innerHTML = repos
-    .map(
-      (r) => `
+    .map((r) => {
+      const safeRepo = JSON.stringify({
+        full_name: r.full_name,
+        language: r.language,
+        html_url: r.html_url
+      }).replace(/"/g, "&quot;");
+
+      return `
         <div class="repo-item">
-            <div class="repo-name"><a href="${
-              r.html_url
-            }" target="_blank" rel="noopener">${escapeHtml(
-        r.full_name
-      )}</a></div>
-            ${
-              r.description
-                ? `<div class="repo-desc">${escapeHtml(r.description)}</div>`
-                : ""
-            }
+            <div class="repo-name"><a href="${r.html_url
+        }" target="_blank" rel="noopener" onclick='trackRepoView(${safeRepo})'>${escapeHtml(
+          r.full_name
+        )}</a></div>
+            ${r.description
+          ? `<div class="repo-desc">${escapeHtml(r.description)}</div>`
+          : ""
+        }
             <div class="repo-meta">
                 <span>★ ${r.stargazers_count || 0}</span>
                 <span>⑂ ${r.forks_count || 0}</span>
@@ -915,7 +919,7 @@ function renderRepos(repos) {
             </div>
         </div>
     `
-    )
+    })
     .join("");
 }
 
@@ -933,13 +937,12 @@ function renderActivity(events) {
       const repo = ev.repo?.name || "";
       const when = timeAgo(ev.created_at);
       const what = describeEvent(ev);
-      return `<li class="activity-item"><div>${escapeHtml(what || type)}${
-        repo
-          ? ` in <a href="https://github.com/${repo}" target="_blank" rel="noopener">${escapeHtml(
-              repo
-            )}</a>`
-          : ""
-      }</div><div class="activity-time">${when}</div></li>`;
+      return `<li class="activity-item"><div>${escapeHtml(what || type)}${repo
+        ? ` in <a href="https://github.com/${repo}" target="_blank" rel="noopener">${escapeHtml(
+          repo
+        )}</a>`
+        : ""
+        }</div><div class="activity-time">${when}</div></li>`;
     })
     .join("");
 }
@@ -949,9 +952,8 @@ function describeEvent(ev) {
     case "PushEvent":
       return `Pushed ${ev.payload?.commits?.length || 0} commit(s)`;
     case "CreateEvent":
-      return `Created ${ev.payload?.ref_type || "item"} ${
-        ev.payload?.ref || ""
-      }`;
+      return `Created ${ev.payload?.ref_type || "item"} ${ev.payload?.ref || ""
+        }`;
     case "IssuesEvent":
       return `Issue ${ev.payload?.action} #${ev.payload?.issue?.number}`;
     case "PullRequestEvent":
@@ -987,9 +989,9 @@ function escapeHtml(str) {
   return String(str).replace(
     /[&<>"']/g,
     (s) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-        s
-      ])
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+      s
+    ])
   );
 }
 
@@ -1033,16 +1035,14 @@ async function fetchContributionSvg(username, token) {
     w.contributionDays.forEach((d, y) => {
       const cx = gap + x * (cell + gap);
       const cy = gap + y * (cell + gap);
-      rects += `<rect x="${cx}" y="${cy}" width="${cell}" height="${cell}" rx="2" ry="2" fill="${
-        d.color || "#ebedf0"
-      }">
+      rects += `<rect x="${cx}" y="${cy}" width="${cell}" height="${cell}" rx="2" ry="2" fill="${d.color || "#ebedf0"
+        }">
                 <title>${d.date}: ${d.contributionCount} contributions</title>
             </rect>`;
     });
   });
-  const label = `<text x="${gap}" y="${
-    height - 4
-  }" font-size="10" fill="#666">Total: ${cal.totalContributions}</text>`;
+  const label = `<text x="${gap}" y="${height - 4
+    }" font-size="10" fill="#666">Total: ${cal.totalContributions}</text>`;
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img">${rects}${label}</svg>`;
 }
 
@@ -1120,9 +1120,8 @@ function renderEventHeatmap(events) {
             </rect>`;
     }
   }
-  const label = `<text x="${gap}" y="${
-    height - 4
-  }" font-size="10" fill="#666">Approx. last ${daysBack} days</text>`;
+  const label = `<text x="${gap}" y="${height - 4
+    }" font-size="10" fill="#666">Approx. last ${daysBack} days</text>`;
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img">${rects}${label}</svg>`;
 }
 
@@ -1312,3 +1311,270 @@ window.addEventListener("resize", () => {
 });
 
 
+// ===================== Recommendation Engine =====================
+const HISTORY_KEY = "xaytheon:view_history";
+
+// Track a repository view
+// Track a repository view
+window.trackRepoView = async function (repo) {
+  try {
+    let history = [];
+
+    // Check if user is logged in
+    const isAuthed = window.XAYTHEON_AUTH && window.XAYTHEON_AUTH.isAuthenticated();
+
+    if (isAuthed) {
+      try {
+        const res = await window.XAYTHEON_AUTH.authenticatedFetch(`${window.location.protocol === "https:" ? "https://your-api-domain.com/api/user" : "http://localhost:5000/api/user"}/history`);
+        if (res.ok) {
+          history = await res.json();
+        }
+      } catch (e) { console.warn("Failed to fetch fresh history", e); }
+    }
+
+    // If empty (network fail or not authed), try local storage
+    if (history.length === 0) {
+      history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    }
+
+    // Remove if already exists (to move to top)
+    const filtered = history.filter(h => h.full_name !== repo.full_name);
+
+    // Add to top
+    filtered.unshift({
+      full_name: repo.full_name,
+      language: repo.language,
+      html_url: repo.html_url,
+      visited_at: Date.now()
+    });
+
+    // Limit to 50
+    if (filtered.length > 50) filtered.length = 50;
+
+    // Save to LocalStorage (always as backup/cache)
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered));
+
+    // Save to Backend if authed
+    if (isAuthed) {
+      await window.XAYTHEON_AUTH.authenticatedFetch(
+        `${window.location.protocol === "https:" ? "https://your-api-domain.com/api/user" : "http://localhost:5000/api/user"}/history`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ history: filtered })
+        }
+      ).catch(e => console.warn("Failed to sync history to backend", e));
+
+      // Auto-update recommendations
+      initRecommendations();
+    }
+
+  } catch (e) {
+    console.warn("Tracking failed", e);
+  }
+};
+
+async function initRecommendations() {
+  const recArea = document.getElementById("recommendations-area");
+  const emptyArea = document.getElementById("rec-empty");
+  const list = document.getElementById("rec-list");
+
+  if (!recArea || !list) {
+    return;
+  }
+
+  if (!window.XAYTHEON_AUTH || !window.XAYTHEON_AUTH.isAuthenticated()) {
+    recArea.classList.add("hidden");
+    if (emptyArea) emptyArea.classList.add("hidden");
+    const authReq = document.querySelector("[data-requires-auth]");
+    if (authReq) authReq.style.display = "none";
+    return;
+  } else {
+    const authReq = document.querySelector("[data-requires-auth]");
+    if (authReq) authReq.style.display = "block";
+  }
+
+  let history = [];
+  let localHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+
+  // Try to load from backend if authenticated and merge
+  try {
+    const res = await window.XAYTHEON_AUTH.authenticatedFetch(`${window.location.protocol === "https:" ? "https://your-api-domain.com/api/user" : "http://localhost:5000/api/user"}/history`);
+    if (res.ok) {
+      const remoteHistory = await res.json();
+
+      // Merge Logic
+      if (remoteHistory.length === 0 && localHistory.length > 0) {
+        // Push local to backend
+        history = localHistory;
+        window.XAYTHEON_AUTH.authenticatedFetch(
+          `${window.location.protocol === "https:" ? "https://your-api-domain.com/api/user" : "http://localhost:5000/api/user"}/history`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ history: localHistory })
+          }
+        );
+      } else {
+        // Intelligent Merge
+        const map = new Map();
+        remoteHistory.forEach(h => map.set(h.full_name, h));
+        localHistory.forEach(h => {
+          if (!map.has(h.full_name)) map.set(h.full_name, h);
+        });
+        history = Array.from(map.values()).sort((a, b) => (b.visited_at || 0) - (a.visited_at || 0)).slice(0, 50);
+      }
+
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } else {
+      throw new Error("Backend failed");
+    }
+  } catch (e) {
+    console.warn("Could not fetch remote history, falling back to local", e);
+    history = localHistory;
+  }
+
+  // Track a search interest
+  const SEARCH_HISTORY_KEY = "xaytheon:search_history";
+  window.trackSearchInterest = function (topic, language) {
+    if (!topic && !language) return;
+    let history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
+
+    // Add to top
+    history.unshift({
+      topic: topic || "",
+      language: language || "",
+      ts: Date.now()
+    });
+
+    // Limit to 20
+    if (history.length > 20) history.length = 20;
+
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+  };
+
+  // Analyze history (clicks)
+  const languages = {};
+  const topics = {};
+
+  history.forEach(h => {
+    if (h.language) languages[h.language] = (languages[h.language] || 0) + 2; // Weight clicks higher
+    // We don't strictly track topics in repo view history yet, but we could if we stored them.
+  });
+
+  // Analyze search history
+  const searchHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
+  searchHistory.forEach(s => {
+    if (s.language) languages[s.language] = (languages[s.language] || 0) + 1;
+    if (s.topic) topics[s.topic] = (topics[s.topic] || 0) + 1;
+  });
+
+  const topLangs = Object.entries(languages)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(e => e[0]);
+
+  const topTopics = Object.entries(topics)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(e => e[0]);
+
+  // Fallback query if no data
+  let q = "";
+  if (topLangs.length === 0 && topTopics.length === 0) {
+    q = "stars:>1000";
+    recArea.classList.remove("hidden");
+    if (emptyArea) emptyArea.classList.add("hidden");
+  } else {
+    // Build complex query
+    const parts = [];
+    topLangs.forEach(l => parts.push(`language:${l}`));
+    topTopics.forEach(t => parts.push(`topic:${t}`));
+    q = parts.join(" ");
+  }
+
+  // Fetch recommendations
+  recArea.classList.remove("hidden");
+  emptyArea.classList.add("hidden");
+
+  if (!list.hasChildNodes() || list.innerText.includes("Loading")) {
+    list.innerHTML = '<div class="muted">Loading personal recommendations...</div>';
+  }
+
+  try {
+    const encodedQ = encodeURIComponent(q);
+    const url = `https://api.github.com/search/repositories?q=${encodedQ}&sort=stars&order=desc&per_page=20`;
+
+    const data = await ghJson(url);
+
+    // Client side filter
+    const viewedNames = new Set(history.map(h => h.full_name));
+    const recommendations = (data.items || [])
+      .filter(r => !viewedNames.has(r.full_name))
+      .slice(0, 6);
+
+    if (recommendations.length === 0) {
+      // Retry with broader query if specific failed
+      if (q !== "stars:>500") {
+        const fallbackUrl = `https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=10`;
+        const fallbackData = await ghJson(fallbackUrl);
+        if (fallbackData && fallbackData.items) {
+          renderRecommendationCards(fallbackData.items.slice(0, 6));
+          return;
+        }
+      }
+
+      // HARD FALLBACK
+      const hardcoded = [
+        { full_name: "facebook/react", name: "react", description: "Hardcoded Fallback 1", language: "JavaScript", stargazers_count: 200000, owner: { login: "facebook" }, html_url: "https://github.com/facebook/react" },
+        { full_name: "vuejs/vue", name: "vue", description: "Hardcoded Fallback 2", language: "JavaScript", stargazers_count: 180000, owner: { login: "vuejs" }, html_url: "https://github.com/vuejs/vue" }
+      ];
+      renderRecommendationCards(hardcoded);
+      return;
+    }
+
+    renderRecommendationCards(recommendations);
+
+  } catch (e) {
+    console.error("Recs failed", e);
+    // HARD FALLBACK on error
+    const hardcoded = [
+      { full_name: "facebook/react", name: "react", description: "Error Fallback 1", language: "JavaScript", stargazers_count: 200000, owner: { login: "facebook" }, html_url: "https://github.com/facebook/react" },
+      { full_name: "vuejs/vue", name: "vue", description: "Error Fallback 2", language: "JavaScript", stargazers_count: 180000, owner: { login: "vuejs" }, html_url: "https://github.com/vuejs/vue" }
+    ];
+    renderRecommendationCards(hardcoded);
+  }
+}
+
+function renderRecommendationCards(repos) {
+  const list = document.getElementById("rec-list");
+  if (!list) return;
+  list.innerHTML = repos.map(r => {
+    const safeRepo = JSON.stringify({
+      full_name: r.full_name,
+      language: r.language,
+      html_url: r.html_url
+    }).replace(/"/g, "&quot;");
+
+    return `
+    <div class="card repo-card">
+       <div class="repo-header">
+         <div class="repo-name">
+           <a href="${r.html_url}" target="_blank" onclick='trackRepoView(${safeRepo})'>${escapeHtml(r.name)}</a>
+         </div>
+         <span class="repo-lang">${r.language || ''}</span>
+       </div>
+       <div class="repo-desc">${escapeHtml(r.description || 'No description')}</div>
+       <div class="repo-meta">
+         <span>★ ${r.stargazers_count}</span>
+         <span class="repo-owner">by ${escapeHtml(r.owner.login)}</span>
+       </div>
+    </div>
+    `;
+  }).join("");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Wait a bit for auth to initialize before fetching recs
+  setTimeout(initRecommendations, 1500);
+});
