@@ -98,7 +98,7 @@
     }
 
     .theme-toggle-auth {
-      position: fixed;
+      position: static;
       top: 20px;
       right: 20px;
       background: transparent;
@@ -191,13 +191,11 @@
       <a class="logo" href="index.html" aria-label="Back to Home">
         <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
       </a>
-      <ul class="nav-menu">
+      <div class="nav-right">
+          <ul class="nav-menu">
         <li><a class="nav-link" href="index.html">Home</a></li>
       </ul>
-    </div>
-  </nav>
-
-  <button class="theme-toggle-auth" id="theme-toggle-auth" aria-label="Toggle dark mode">
+      <button class="theme-toggle-auth" id="theme-toggle-auth" aria-label="Toggle dark mode">
     <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="5" />
@@ -211,6 +209,12 @@
       <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
     </svg>
   </button>
+      </div>
+      
+    </div>
+  </nav>
+
+  
 
   <div class="auth-wrap">
   <div class="auth-card">

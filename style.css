@@ -253,6 +253,18 @@ body.eightgon-page {
   align-items: center;
   height: 70px;
 }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 1100px) {
+  .nav-container {
+    flex-wrap: wrap;
+  }
+}
+
 
 .logo {
   display: flex;
