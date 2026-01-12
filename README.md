@@ -41,7 +41,39 @@ Features:
 
 **Purpose**: Gives you a consolidated view of your GitHub presence and activity patterns.
 
-### 3. **Community Highlights** (community.html)
+### 3. **Advanced Analytics Dashboard** (analytics.html)
+**Historical GitHub Growth Tracking**
+
+Features:
+- **Historical Data Tracking**:
+  - Automated snapshots of GitHub metrics over time
+  - Stores stars, followers, repos, commits, and language distribution
+  - Tracks contribution velocity and growth patterns
+- **Interactive Visualizations**:
+  - Line charts for stars and followers growth
+  - Bar charts for commit activity
+  - Doughnut charts for language distribution
+  - Contribution velocity heatmaps
+- **Date Range Filtering**:
+  - Custom date range selection
+  - Quick filters (7, 30, 90, 365 days)
+  - Comparison tools for different time periods
+- **Growth Metrics**:
+  - Percentage change calculations
+  - Growth rate analysis
+  - Min/max/average statistics
+- **Data Export**:
+  - Export analytics in JSON format
+  - Export analytics in CSV format
+  - Download historical snapshots for external analysis
+- **Automated Snapshots**:
+  - Scheduled periodic data collection
+  - Configurable snapshot intervals
+  - Automatic cleanup of old data
+
+**Purpose**: Enables developers to track their GitHub growth over time, understand contribution patterns, and showcase their progress with data-driven insights.
+
+### 4. **Community Highlights** (community.html)
 **Trending Repository Discovery Engine**
 
 Features:
@@ -219,12 +251,13 @@ xaytheon/
 
 ## Platform Architecture
 
-The platform consists of **5 interconnected pages**:
+The platform consists of **6 interconnected pages**:
 1. **Home** → Central authentication & navigation hub
 2. **GitHub Dashboard** → Personal analytics
-3. **Community Highlights** → Trending discovery
-4. **Explore by Topic** → Deep exploration
-5. **Contributions** → Personal tracking
+3. **Analytics Dashboard** → Historical growth tracking
+4. **Community Highlights** → Trending discovery
+5. **Explore by Topic** → Deep exploration
+6. **Contributions** → Personal tracking
 
 Each page focuses on a specific aspect of the GitHub ecosystem while maintaining seamless navigation between features.
 

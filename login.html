@@ -98,7 +98,7 @@
     }
 
     .theme-toggle-auth {
-      position: fixed;
+      position: static;
       top: 20px;
       right: 20px;
       background: transparent;
@@ -191,13 +191,11 @@
       <a class="logo" href="index.html" aria-label="Back to Home">
         <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
       </a>
-      <ul class="nav-menu">
+      <div class="nav-right">
+          <ul class="nav-menu">
         <li><a class="nav-link" href="index.html">Home</a></li>
       </ul>
-    </div>
-  </nav>
-
-  <button class="theme-toggle-auth" id="theme-toggle-auth" aria-label="Toggle dark mode">
+      <button class="theme-toggle-auth" id="theme-toggle-auth" aria-label="Toggle dark mode">
     <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="5" />
@@ -211,37 +209,126 @@
       <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
     </svg>
   </button>
+      </div>
+      
+    </div>
+  </nav>
+
+  
 
   <div class="auth-wrap">
-    <div class="auth-card">
-      <div class="auth-title">Sign in</div>
-      <div class="auth-sub">Sign in using your email and password</div>
+  <div class="auth-card">
+    <div class="auth-title">Sign in</div>
+    <div class="auth-sub">Sign in using your email and password</div>
 
-      <form id="login-form" class="auth-form" autocomplete="on">
-        <label for="login-email">Email</label>
-        <input id="login-email" type="email" placeholder="you@example.com" required />
+    <form id="login-form" class="auth-form" autocomplete="on">
+      <label for="login-email">Email</label>
+      <input
+  id="login-email"
+  name="email"
+  type="email"
+  placeholder="you@example.com"
+  autocomplete="email"
+  required
+/>
 
-        <label for="login-password">Password</label>
-        <input id="login-password" type="password" placeholder="••••••••" required />
 
-        <div class="auth-actions">
-          <button class="btn btn-primary" type="submit">Sign in</button>
-          <a class="btn btn-outline" href="index.html">Back</a>
-        </div>
+      <label for="login-password">Password</label>
+      <div class="password-wrapper">
+        <input
+  id="login-password"
+  name="password"
+  type="password"
+  placeholder="••••••••"
+  autocomplete="current-password"
+  required
+/>
 
-        <div id="login-status" class="status muted" aria-live="polite"></div>
-      </form>
-
-      <div class="center muted" style="margin-top:12px;">
-        New here?
-        <a href="register.html">Create an account</a>
+        <button
+          type="button"
+          class="toggle-password"
+          aria-label="Show password"
+          aria-pressed="false"
+        >
+          <img
+            id="eye-icon"
+            src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000"
+            alt="Show password"
+          />
+        </button>
       </div>
 
-      <div class="center muted" style="margin-top:12px;">
-        Authentication is handled securely by the Xaytheon backend.
+      <div class="auth-actions">
+        <button class="btn btn-primary" type="submit">Sign in</button>
+        <a class="btn btn-outline" href="index.html">Back</a>
       </div>
+
+      <div id="login-status" class="status muted" aria-live="polite"></div>
+    </form>
+
+    <div class="center muted" style="margin-top:12px;">
+      New here?
+      <a href="register.html">Create an account</a>
+    </div>
+
+    <div class="center muted" style="margin-top:12px;">
+      Authentication is handled securely by the Xaytheon backend.
     </div>
   </div>
+</div>
+
+<!-- Inline CSS -->
+<style>
+  .password-wrapper {
+    position: relative;
+  }
+
+  .password-wrapper input {
+    width: 100%;
+    padding-right: 2.8rem;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .toggle-password img {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+<!-- Inline JS -->
+<script>
+  const toggleBtn = document.querySelector(".toggle-password");
+  const passwordInput = document.getElementById("login-password");
+  const eyeIcon = document.getElementById("eye-icon");
+
+  toggleBtn.addEventListener("click", function () {
+    const isHidden = passwordInput.type === "password";
+
+    passwordInput.type = isHidden ? "text" : "password";
+
+    eyeIcon.src = isHidden
+      ? "https://img.icons8.com/?size=100&id=7840&format=png&color=000000"
+      : "https://img.icons8.com/?size=100&id=59814&format=png&color=000000";
+
+    eyeIcon.alt = isHidden ? "Hide password" : "Show password";
+    toggleBtn.setAttribute("aria-pressed", isHidden);
+    toggleBtn.setAttribute(
+      "aria-label",
+      isHidden ? "Hide password" : "Show password"
+    );
+  });
+</script>
+
 
   <script src="auth.js"></script>
   <script>
@@ -269,7 +356,13 @@
     const originalBtnText = submitBtn.textContent;
 
     function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      // More robust email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email) && email.length <= 254 && email.length >= 3;
+    }
+
+    function validatePassword(password) {
+      return typeof password === 'string' && password.length >= 8 && password.length <= 128;
     }
 
     function showError(message) {
@@ -330,9 +423,9 @@
         return;
       }
 
-      if (password.length < 8) {
+      if (!validatePassword(password)) {
         passwordEl.classList.add("input-error");
-        showError("Password must be at least 8 characters");
+        showError("Password must be between 8 and 128 characters");
         passwordEl.focus();
         return;
       }

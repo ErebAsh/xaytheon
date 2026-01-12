@@ -245,6 +245,70 @@
     const tech = document.getElementById('cf-tech').value.trim();
     const file = document.getElementById('cf-shot').files[0] || null;
 
+    // Validation
+    if (!project) {
+      status('Please enter a project name.', 'error');
+      document.getElementById('cf-project').focus();
+      return;
+    }
+
+    if (project.length > 100) {
+      status('Project name must be 100 characters or less.', 'error');
+      document.getElementById('cf-project').focus();
+      return;
+    }
+
+    if (link && link.length > 500) {
+      status('Link must be 500 characters or less.', 'error');
+      document.getElementById('cf-link').focus();
+      return;
+    }
+
+    if (link && !/^https?:\/\/.+/.test(link)) {
+      status('Link must be a valid HTTP or HTTPS URL.', 'error');
+      document.getElementById('cf-link').focus();
+      return;
+    }
+
+    if (program && program.length > 100) {
+      status('Program name must be 100 characters or less.', 'error');
+      document.getElementById('cf-program').focus();
+      return;
+    }
+
+    if (!type) {
+      status('Please select a contribution type.', 'error');
+      document.getElementById('cf-type').focus();
+      return;
+    }
+
+    if (description.length > 1000) {
+      status('Description must be 1000 characters or less.', 'error');
+      document.getElementById('cf-desc').focus();
+      return;
+    }
+
+    if (tech && tech.length > 200) {
+      status('Technology must be 200 characters or less.', 'error');
+      document.getElementById('cf-tech').focus();
+      return;
+    }
+
+    // Validate file if present
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        status('Screenshot file must be 5MB or smaller.', 'error');
+        return;
+      }
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        status('Screenshot must be a JPEG, PNG, GIF, or WebP image.', 'error');
+        return;
+      }
+    }
+
     status('Saving...');
     // disable button while saving
     const btn = (e.submitter && e.submitter.tagName === 'BUTTON') ? e.submitter : document.querySelector('#contrib-form button[type="submit"]');

@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const { validateEmail, validatePassword, validateString } = require("../utils/validation");
 
 const ACCESS_TOKEN_EXPIRY = "15m";
 const REFRESH_TOKEN_EXPIRY = "7d";
@@ -34,21 +35,29 @@ exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
+    // Validate and sanitize inputs
+    const sanitizedEmail = validateEmail(email);
+    const sanitizedPassword = validatePassword(password);
 
-    if (password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.createUser(email, hashedPassword);
+    const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
+    await User.createUser(sanitizedEmail, hashedPassword);
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     console.error("Registration error:", err);
-    res.status(400).json({ message: "User already exists or registration failed" });
+
+    // Handle specific database errors
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || err.message.includes('UNIQUE constraint failed')) {
+      return res.status(409).json({ message: "An account with this email already exists" });
+    }
+
+    // Handle validation errors
+    if (err.name === 'ValidationError') {
+      return res.status(err.statusCode).json({ message: err.message, field: err.field });
+    }
+
+    // Generic error response
+    res.status(500).json({ message: "Registration failed. Please try again later." });
   }
 };
 
@@ -56,18 +65,18 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
+    // Validate and sanitize inputs
+    const sanitizedEmail = validateEmail(email);
+    const sanitizedPassword = validatePassword(password);
 
-    const user = await User.findByEmail(email);
+    const user = await User.findByEmail(sanitizedEmail);
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(sanitizedPassword, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const { accessToken, refreshToken } = generateTokens(user.id);
@@ -83,7 +92,13 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: "Login failed" });
+
+    // Handle validation errors
+    if (err.name === 'ValidationError') {
+      return res.status(err.statusCode).json({ message: err.message, field: err.field });
+    }
+
+    res.status(500).json({ message: "Login failed. Please try again later." });
   }
 };
 

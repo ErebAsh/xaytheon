@@ -12,10 +12,35 @@
   const statusEl = document.getElementById('trend-status');
   const resultsEl = document.getElementById('trend-results');
   const resetBtn = document.getElementById('trend-reset');
+  const cacheInfoEl = document.getElementById('trend-cache-info');
+
+  // Debounce helper
+  function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  // API call tracker for rate limiting
+  const API_TRACKER = {
+    lastCall: 0,
+    minInterval: 2000, // 2 seconds between calls to respect rate limits
+    
+    canCall() {
+      const now = Date.now();
+      return (now - this.lastCall) >= this.minInterval;
+    },
+    
+    recordCall() {
+      this.lastCall = Date.now();
+    }
+  };
 
   // In-memory + local cache
-  const memoryCache = new Map(); // key -> { at:number, items:Array }
-  const TTL_MS = 5 * 60 * 1000; // 5 minutes
+  const memoryCache = new Map(); // key -> { at:number, items:Array, expiresAt: number }
+  const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
   // --- Heap implementation (min-heap for Top-K) ---
   class BinaryHeap {
@@ -120,12 +145,19 @@
       'Accept': 'application/vnd.github+json',
       'User-Agent': 'XAYTHEON-Community-Highlights'
     }});
-    if(res.status===403){
-      // Possibly rate limited; surface friendly error text
-      const reset = res.headers.get('x-ratelimit-reset');
-      const resetIn = reset ? Math.max(0, Math.round((+reset*1000 - Date.now())/1000)) : null;
-      throw new Error(`Rate limit reached. Try again ${resetIn?`in ~${Math.ceil(resetIn/60)} min`:'later'}.`);
+    
+    // Check for rate limiting
+    if (res.status === 403 || res.status === 429) {
+      const resetTime = res.headers.get('X-RateLimit-Reset');
+      const remaining = res.headers.get('X-RateLimit-Remaining');
+      
+      if (remaining === '0' || res.status === 429) {
+        const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000) : null;
+        const waitTime = resetDate ? Math.ceil((resetDate - Date.now()) / 60000) : 'unknown';
+        throw new Error(`⚠️ GitHub API rate limit exceeded. Please try again in ${waitTime} minutes.`);
+      }
     }
+    
     if(!res.ok){
       const text = await res.text();
       throw new Error(`GitHub API ${res.status}: ${text}`);
@@ -168,64 +200,180 @@
   }
 
   function saveCache(key, value){
-    const entry = { at: Date.now(), items: value };
+    const entry = { at: Date.now(), items: value, expiresAt: Date.now() + TTL_MS };
     memoryCache.set(key, entry);
     try{ localStorage.setItem('xaytheon:community:'+key, JSON.stringify(entry)); }catch{}
+    updateCacheInfo(key, entry);
   }
   function loadCache(key){
     const mem = memoryCache.get(key);
-    if(mem && Date.now()-mem.at<TTL_MS) return mem.items;
+    if(mem && Date.now() < mem.expiresAt) {
+      updateCacheInfo(key, mem);
+      return mem.items;
+    }
     try{
       const raw = localStorage.getItem('xaytheon:community:'+key);
       if(!raw) return null;
       const parsed = JSON.parse(raw);
-      if(parsed && Date.now()-parsed.at<TTL_MS) return parsed.items;
+      if(parsed && Date.now() < parsed.expiresAt) {
+        // Move to memory cache for faster access
+        memoryCache.set(key, parsed);
+        updateCacheInfo(key, parsed);
+        return parsed.items;
+      } else {
+        // Remove expired entry
+        localStorage.removeItem('xaytheon:community:'+key);
+      }
     }catch{}
     return null;
   }
+  
+  function updateCacheInfo(key, entry) {
+    if (!cacheInfoEl) return;
+    if (entry) {
+      const age = Date.now() - entry.at;
+      const minutesOld = Math.floor(age / 60000);
+      const timeLeft = Math.max(0, Math.floor((entry.expiresAt - Date.now()) / 60000));
+      cacheInfoEl.innerHTML = `Cached ${minutesOld} min ago, expires in ${timeLeft} min <button id="clear-community-cache" class="btn btn-sm" style="margin-left: 10px;">Clear Cache</button>`;
+      
+      // Add event listener for clear cache button
+      setTimeout(() => {
+        const clearBtn = document.getElementById('clear-community-cache');
+        if (clearBtn) {
+          clearBtn.onclick = () => {
+            clearCache();
+            cacheInfoEl.innerHTML = 'Cache cleared';
+          };
+        }
+      }, 100);
+    }
+  }
+  
+  function clearCache() {
+    memoryCache.clear();
+    try {
+      // Remove all community cache entries
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('xaytheon:community:')) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch {}
+  }
 
-  async function update(){
+  // Debounced update function
+  const debouncedUpdate = debounce(async function update(){
     const filters = {
-      language: (langEl.value||'').trim(),
-      topic: (topicEl.value||'').trim(),
-      days: parseInt(windowEl.value||'30',10) || 30,
-      k: Math.max(1, Math.min(20, parseInt(kEl.value||'10',10)))
+      language,
+      topic,
+      days,
+      k: Math.max(1, Math.min(20, k))
     };
     const cacheKey = keyFor(filters);
+    
+    // Disable form during loading
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Loading...';
+    }
+    
+    // Disable all form inputs
+    const inputs = form.querySelectorAll('input, select, button');
+    inputs.forEach(input => {
+      if (input !== submitBtn) input.disabled = true;
+    });
+    
     setStatus('Loading trending repositories…');
     resultsEl.innerHTML = '<div class="muted">Loading…</div>';
-    try{
+    
+    try {
+      // Rate limiting check
+      if (!API_TRACKER.canCall()) {
+        setStatus('Please wait a moment before making another request.', 'error');
+        return;
+      }
+      
+      API_TRACKER.recordCall();
+      
       const cached = loadCache(cacheKey);
       let items;
       if(cached){
         items = cached;
+        setStatus('Loaded from cache (fetching fresh data in background)...');
+        
+        // Fetch fresh data in background
+        setTimeout(async () => {
+          try {
+            const repos = await fetchRepos(filters);
+            const top = topK(repos, filters.k);
+            saveCache(cacheKey, top);
+            
+            // Only update UI if still relevant
+            const currentFilters = {
+              language: (langEl.value||'').trim(),
+              topic: (topicEl.value||'').trim(),
+              days: parseInt(windowEl.value||'30',10) || 30,
+              k: Math.max(1, Math.min(20, parseInt(kEl.value||'10',10)))
+            };
+            const currentCacheKey = keyFor(currentFilters);
+            if (currentCacheKey === cacheKey) {
+              renderCards(top);
+              setStatus('Updated with fresh data');
+            }
+          } catch(e) {
+            console.warn('Background refresh failed:', e);
+          }
+        }, 100);
       } else {
         const repos = await fetchRepos(filters);
         const top = topK(repos, filters.k);
         items = top;
         saveCache(cacheKey, items);
       }
+      
       renderCards(items);
       setStatus('Done');
-    } catch(e){
+    } catch(e) {
       console.error(e);
       setStatus(e.message || 'Failed to fetch trending repos', 'error');
-      resultsEl.innerHTML = '<div class="muted">Couldn\'t load trending repositories right now.</div>';
+      resultsEl.innerHTML = `<div class="muted">Couldn't load trending repositories right now.</div>
+                            <button id="retry-btn" class="btn btn-sm" style="margin-top: 10px;">Retry</button>`;
+      
+      // Add retry button handler
+      setTimeout(() => {
+        const retryBtn = document.getElementById('retry-btn');
+        if (retryBtn) {
+          retryBtn.onclick = () => {
+            update();
+          };
+        }
+      }, 100);
+    } finally {
+      // Re-enable form
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Update';
+      }
+      inputs.forEach(input => {
+        if (input !== submitBtn) input.disabled = false;
+      });
     }
-  }
+  }, 300); // 300ms debounce
 
   // Events
-  form.addEventListener('submit', (e)=>{ e.preventDefault(); update(); });
+  form.addEventListener('submit', (e)=>{ e.preventDefault(); debouncedUpdate(); });
   resetBtn.addEventListener('click', ()=>{
     langEl.value = '';
     topicEl.value = '';
     windowEl.value = '30';
     kEl.value = '10';
-    update();
+    debouncedUpdate();
   });
 
   // Initial load with defaults
-  update();
+  debouncedUpdate();
 })();
 
 const scrollTopBtn = document.getElementById("scrollTopBtn");
