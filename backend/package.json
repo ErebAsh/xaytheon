@@ -17,6 +17,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "node-cron": "^3.0.3",
+    "socket.io": "^4.7.4",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
