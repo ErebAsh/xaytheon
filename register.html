@@ -172,10 +172,24 @@
 
       <form id="register-form" class="auth-form">
         <label for="reg-email">Email</label>
-        <input id="reg-email" type="email" required />
+      <input
+  id="reg-email"
+  name="email"
+  type="email"
+  autocomplete="email"
+  required
+/>
+
 
         <label for="reg-password">Password</label>
-        <input id="reg-password" type="password" required />
+       <input
+  id="reg-password"
+  name="password"
+  type="password"
+  autocomplete="new-password"
+  required
+/>
+
 
         <div class="auth-actions">
           <button class="btn btn-primary" type="submit">Register</button>
@@ -218,7 +232,13 @@
     const originalBtnText = submitBtn.textContent;
 
     function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      // More robust email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email) && email.length <= 254 && email.length >= 3;
+    }
+
+    function validatePassword(password) {
+      return typeof password === 'string' && password.length >= 8 && password.length <= 128;
     }
 
     function showError(message) {
@@ -279,9 +299,9 @@
         return;
       }
 
-      if (password.length < 8) {
+      if (!validatePassword(password)) {
         passwordEl.classList.add("input-error");
-        showError("Password must be at least 8 characters");
+        showError("Password must be between 8 and 128 characters");
         passwordEl.focus();
         return;
       }

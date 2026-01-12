@@ -10,6 +10,10 @@ exports.verifyAccessToken = (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
+    if (!token || token.length > 1000) {
+      return res.status(401).json({ message: "Invalid token format" });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decoded.type !== "access") {
@@ -33,7 +37,7 @@ exports.verifyAccessToken = (req, res, next) => {
 exports.loginRateLimiter = (() => {
   const attempts = new Map();
   const MAX_ATTEMPTS = 5;
-  const WINDOW_MS = 15 * 60 * 1000;
+  const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
   return (req, res, next) => {
     const identifier = req.ip || req.connection.remoteAddress;
@@ -48,12 +52,42 @@ exports.loginRateLimiter = (() => {
 
     if (recentAttempts.length >= MAX_ATTEMPTS) {
       return res.status(429).json({ 
-        message: "Too many login attempts. Please try again later." 
+        message: "Too many login attempts. Please try again later.",
+        retryAfter: Math.ceil((WINDOW_MS - (now - recentAttempts[0])) / 1000)
       });
     }
 
     recentAttempts.push(now);
     attempts.set(identifier, recentAttempts);
+    next();
+  };
+})();
+
+exports.generalRateLimiter = (() => {
+  const requests = new Map();
+  const MAX_REQUESTS = 100; // requests per window
+  const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+  return (req, res, next) => {
+    const identifier = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+    
+    if (!requests.has(identifier)) {
+      requests.set(identifier, []);
+    }
+
+    const userRequests = requests.get(identifier);
+    const recentRequests = userRequests.filter(time => now - time < WINDOW_MS);
+
+    if (recentRequests.length >= MAX_REQUESTS) {
+      return res.status(429).json({ 
+        message: "Too many requests. Please try again later.",
+        retryAfter: Math.ceil((WINDOW_MS - (now - recentRequests[0])) / 1000)
+      });
+    }
+
+    recentRequests.push(now);
+    requests.set(identifier, recentRequests);
     next();
   };
 })();

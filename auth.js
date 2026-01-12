@@ -172,20 +172,56 @@
   }
 
   async function login(email, password) {
+    // Input validation
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
+      throw new Error('Email and password are required');
+    }
+
+    if (email.length > 254 || password.length > 128) {
+      throw new Error('Input data too long');
+    }
+
+    if (email.length < 3 || password.length < 8) {
+      throw new Error('Input data too short');
+    }
+
     try {
       const res = await fetchWithTimeout(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Login failed");
+        let errorMessage = "Login failed";
+        try {
+          const err = await res.json();
+          errorMessage = err.message || errorMessage;
+        } catch {
+          // If we can't parse the error response, use status text
+          errorMessage = res.statusText || errorMessage;
+        }
+
+        // Handle specific HTTP status codes
+        if (res.status === 429) {
+          throw new Error('Too many login attempts. Please wait before trying again.');
+        } else if (res.status === 401) {
+          throw new Error('Invalid email or password');
+        } else if (res.status >= 500) {
+          throw new Error('Server error. Please try again later.');
+        }
+
+        throw new Error(errorMessage);
       }
 
       const data = await res.json();
+
+      // Validate response data
+      if (!data.accessToken || !data.user) {
+        throw new Error('Invalid response from server');
+      }
+
       setAccessToken(data.accessToken, data.expiresIn, data.user);
 
       if (data.refreshToken) {
@@ -198,34 +234,67 @@
       if (err.message.includes('timeout')) {
         throw new Error('Request timeout. Please check your connection.');
       }
-      if (err.message.includes('Failed to fetch')) {
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         throw new Error('Network error. Please check your connection.');
       }
+      // Re-throw the original error if it's already user-friendly
       throw err;
     }
   }
 
   async function register(email, password) {
+    // Input validation
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
+      throw new Error('Email and password are required');
+    }
+
+    if (email.length > 254 || password.length > 128) {
+      throw new Error('Input data too long');
+    }
+
+    if (email.length < 3 || password.length < 8) {
+      throw new Error('Input data too short');
+    }
+
     try {
       const res = await fetchWithTimeout(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Registration failed");
+        let errorMessage = "Registration failed";
+        try {
+          const err = await res.json();
+          errorMessage = err.message || errorMessage;
+        } catch {
+          // If we can't parse the error response, use status text
+          errorMessage = res.statusText || errorMessage;
+        }
+
+        // Handle specific HTTP status codes
+        if (res.status === 409) {
+          throw new Error('An account with this email already exists');
+        } else if (res.status === 429) {
+          throw new Error('Too many registration attempts. Please wait before trying again.');
+        } else if (res.status >= 500) {
+          throw new Error('Server error. Please try again later.');
+        }
+
+        throw new Error(errorMessage);
       }
 
-      return res.json();
+      const data = await res.json();
+      return data;
     } catch (err) {
       if (err.message.includes('timeout')) {
         throw new Error('Request timeout. Please check your connection.');
       }
-      if (err.message.includes('Failed to fetch')) {
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         throw new Error('Network error. Please check your connection.');
       }
+      // Re-throw the original error if it's already user-friendly
       throw err;
     }
   }

@@ -2,18 +2,172 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitHub Dashboard — XAYTHEON</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css" />
-  <!-- Supabase SDK & auth bootstrap -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
-  <script defer src="auth.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Dashboard — XAYTHEON</title>
+
+    <!-- Supabase SDK & auth bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
+    <script defer src="auth.js"></script>
+    <script>
+        const theme = localStorage.getItem("theme")
+        if (theme) {
+          document.documentElement.setAttribute("data-theme", theme)
+        }
+    </script>
+    <!--Styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css" />
+    <style>
+   .section-title{
+  font-family:VT323;
+  font-size:60px;
+  position:relative;
+  top:10vh;
+  left:50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+ .navbar {
+   background-color: #000;
+ }
+
+ .navbar a,
+ .navbar .theme-toggle {
+   color: #fff;
+ }
+ .navbar .theme-toggle svg {
+   stroke: #fff;
+ }
+ .navbar .logo-img {
+   filter: brightness(0) invert(1);
+ }
+
+ #gh-username::placeholder {
+   color: rgba(0, 0, 0, 0.6);
+ }
+
+ #gh-username:focus {
+   border-color: rgba(0, 0, 0, 0.6);
+   box-shadow:
+     0 0 0 3px rgba(0, 0, 0, 0.1),
+     0 12px 28px rgba(0, 0, 0, 0.12);
+ }
+ #gh-username {
+   background: rgba(99, 102, 241, 0.12); /* accent tint */
+   backdrop-filter: blur(14px);
+   -webkit-backdrop-filter: blur(14px);
+
+   border: 1px solid rgba(99, 102, 241, 0.25);
+   border-radius: 14px;
+
+   color: #000;
+ }
+
+ /* =========================
+    PROFILE CARD ANIMATION
+    ========================= */
+
+ .profile-card {
+   position: relative;
+   overflow: hidden;
+   min-height: 320px;
+ }
+
+ /* --- Base layout (before hover) --- */
+.profile-row {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   text-align: center;
+   gap: 10px;
+   padding-bottom: 60px;
+
+   transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+   will-change: transform;
+ }
+
+ /* Avatar */
+ .avatar {
+   width: 96px;
+   height: 96px;
+   border-radius: 50%;
+   object-fit: cover;
+
+   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+   will-change: transform;
+ }
+
+ /* Hide secondary text initially */
+ .profile-login,
+ .profile-bio {
+   opacity: 0;
+   transform: translateY(6px);
+   max-width: 100%;
+   word-wrap: break-word;
+
+   transition:
+     opacity 0.45s ease 0.15s,
+     transform 0.45s ease 0.15s;
+
+   will-change: opacity, transform;
+ }
+
+ /* Stats hidden & removed from flow */
+ .profile-stats {
+   position: absolute;
+   bottom: 20px;
+   left: 50%;
+   transform: translate(-50%, 20px);
+   opacity: 0;
+
+   display: flex;
+   gap: 28px;
+
+   transition:
+     opacity 0.6s ease 0.2s,
+     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+
+   will-change: opacity, transform;
+ }
+
+ /* =========================
+    HOVER STATE
+    ========================= */
+
+.profile-card:hover .profile-row {
+   flex-direction: row;
+   align-items: center;
+   text-align: left;
+   transform: translateX(0px);
+   padding-bottom: 80px;
+   gap: 30px;
+   padding-left: 20px;
+ }
+
+ .profile-card:hover .avatar {
+   transform: scale(0.6);
+   flex-shrink: 0;
+   margin-top: -20px;
+ }
+
+ .profile-card:hover .profile-login,
+ .profile-card:hover .profile-bio {
+   opacity: 1;
+   transform: translateY(0);
+ }
+
+ .profile-card:hover .profile-stats {
+   opacity: 1;
+   transform: translate(-50%, 0);
+ }
+
+    </style>
 </head>
 
 <body class="eightgon-page">
-  <div class="page-wrapper">
+<div class="page-wrapper">
 
     <nav class="navbar">
       <div class="nav-container">
@@ -97,8 +251,6 @@
                   <div><span id="gh-following">0</span><label>Following</label></div>
                   <div><span id="gh-repos-count">0</span><label>Repos</label></div>
                 </div>
-              </div>
-            </div>
 
             <div class="card contributions-card" id="gh-contributions">
               <div class="card-header">
@@ -111,27 +263,41 @@
               </div>
             </div>
 
-            <div class="card repos-card" id="gh-repos" data-requires-auth style="display:none;">
-              <div class="card-header">
-                <h3>Top Repositories</h3>
-                <div class="muted small">Sorted by stars</div>
-              </div>
-              <div class="card-body">
-                <div id="gh-repo-list" class="repo-list"></div>
-              </div>
+                    <div class="card repos-card" id="gh-repos" data-requires-auth style="display:none;">
+                        <div class="card-header">
+                            <h3>Top Repositories</h3>
+                            <div class="muted small">Sorted by stars</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="gh-repo-list" class="repo-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="card activity-card" id="gh-activity" data-requires-auth style="display:none;">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                            <div class="muted small">Public events</div>
+                        </div>
+                        <div class="card-body">
+                            <ul id="gh-activity-list" class="activity-list"></ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="card activity-card" id="gh-activity" data-requires-auth style="display:none;">
-              <div class="card-header">
-                <h3>Recent Activity</h3>
-                <div class="muted small">Public events</div>
-              </div>
-              <div class="card-body">
-                <ul id="gh-activity-list" class="activity-list"></ul>
-              </div>
+            <div class="cursor-container">
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
+                <span class="cursor-dot"></span>
             </div>
-          </div>
-        </div>
+</div>
+</section>
+
 
         <div class="cursor-container">
           <span class="cursor-dot"></span>

@@ -19,7 +19,6 @@ const shapes = {
 
 // Initialize the 3D scene
 function init() {
- fix-loader-accessibility
     // Get canvas element
     const canvas = document.getElementById('three-canvas');
     const container = document.querySelector('.canvas-container');
@@ -80,9 +79,6 @@ setTimeout(() => {
     // Start animation loop
     animate();
 
-  // Get canvas element
-  const canvas = document.getElementById("three-canvas");
-  const container = document.querySelector(".canvas-container");
 
   // Create scene
   scene = new THREE.Scene();
@@ -90,7 +86,6 @@ setTimeout(() => {
   // renderer will composite over the white page background
 
   // Create camera
-  const aspectRatio = container.clientWidth / container.clientHeight;
   camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
   camera.position.set(5, 5, 5);
 
@@ -108,17 +103,6 @@ setTimeout(() => {
   // Add lighting
   setupLighting();
 
-  // Load model: allow page to specify a different model via data-model
-  const modelPath =
-    canvas && canvas.dataset.model
-      ? canvas.dataset.model
-      : "assets/models/prism.glb";
-  loadGltfFromUrl(modelPath, undefined, () => {
-    console.warn(
-      "Falling back to primitive shape because prism.glb failed to load."
-    );
-    safeCreatePrimitiveFallback();
-  });
 
   // Setup controls
   setupControls();
@@ -685,377 +669,167 @@ Have fun exploring! 🚀
 `);
 
 // ===================== GitHub Dashboard =====================
+
+// Dashboard request state
+let dashboardState = "idle"; // idle | loading | success | error
+let requestInFlight = false;
+
 // Cache management with TTL
 const GITHUB_CACHE = {
-  TTL: 10 * 60 * 1000, // 10 minutes
-  prefix: 'xaytheon:gh:',
-  
+  TTL: 10 * 60 * 1000,
+  prefix: "xaytheon:gh:",
+
   set(key, data) {
-    try {
-      const entry = {
-        data,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(this.prefix + key, JSON.stringify(entry));
-    } catch (e) {
-      console.warn('Cache set failed:', e);
-    }
+    localStorage.setItem(
+      this.prefix + key,
+      JSON.stringify({ data, timestamp: Date.now() })
+    );
   },
-  
+
   get(key) {
-    try {
-      const item = localStorage.getItem(this.prefix + key);
-      if (!item) return null;
-      
-      const entry = JSON.parse(item);
-      const age = Date.now() - entry.timestamp;
-      
-      if (age > this.TTL) {
-        this.remove(key);
-        return null;
-      }
-      
-      return entry.data;
-    } catch (e) {
-      console.warn('Cache get failed:', e);
+    const raw = localStorage.getItem(this.prefix + key);
+    if (!raw) return null;
+
+    const entry = JSON.parse(raw);
+    if (Date.now() - entry.timestamp > this.TTL) {
+      localStorage.removeItem(this.prefix + key);
       return null;
     }
+    return entry.data;
   },
-  
-  remove(key) {
-    try {
-      localStorage.removeItem(this.prefix + key);
-    } catch (e) {
-      console.warn('Cache remove failed:', e);
-    }
-  },
-  
+
   clear() {
-    try {
-      const keys = Object.keys(localStorage).filter(k => k.startsWith(this.prefix));
-      keys.forEach(k => localStorage.removeItem(k));
-    } catch (e) {
-      console.warn('Cache clear failed:', e);
-    }
-  }
-};
-
-// Debounce helper
-function debounce(func, delay) {
-  let timeoutId;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
-}
-
-// API call tracker for rate limiting
-const API_TRACKER = {
-  lastCall: 0,
-  minInterval: 1000, // 1 second between calls
-  
-  canCall() {
-    const now = Date.now();
-    return (now - this.lastCall) >= this.minInterval;
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith(this.prefix))
+      .forEach((k) => localStorage.removeItem(k));
   },
-  
-  recordCall() {
-    this.lastCall = Date.now();
-  }
 };
 
-function initGithubDashboard() {
-  const form = document.getElementById("github-form");
-  if (!form) return; // section not present
+// ---------------- UI STATE HANDLER ----------------
+function setDashboardState(state, message = "") {
+  dashboardState = state;
 
-  const usernameInput = document.getElementById("gh-username");
+  const submitBtn = document.querySelector(
+    '#github-form button[type="submit"]'
+  );
   const clearBtn = document.getElementById("gh-clear");
   const status = document.getElementById("github-status");
-  let isLoading = false;
-  
-  usernameInput.addEventListener('input', () => {
-    setStatus('');
-  });
 
+  const loading = state === "loading";
 
+  if (submitBtn && clearBtn) {
+    submitBtn.disabled = loading;
+    clearBtn.disabled = loading;
+    submitBtn.textContent = loading ? "Loading…" : "Load Dashboard";
+  }
 
-  // Restore saved creds
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("xaytheon:ghCreds") || "null"
-    );
-    if (saved && saved.username) {
-      usernameInput.value = saved.username;
-      loadGithubDashboard(saved.username);
-    }
-  } catch { }
+  if (status) {
+    status.textContent = message;
+    status.className = `github-status ${state}`;
+  }
+}
+
+// ---------------- INIT ----------------
+function initGithubDashboard() {
+  const form = document.getElementById("github-form");
+  if (!form) return;
+
+  const usernameInput = document.getElementById("gh-username");
+
+  const saved = JSON.parse(localStorage.getItem("xaytheon:ghCreds") || "null");
+  if (saved?.username) {
+    usernameInput.value = saved.username;
+    loadGithubDashboard(saved.username);
+  }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const username = usernameInput.value.trim();
+
     if (!username) {
-      setStatus("Please enter a GitHub username.", "error");
+      setDashboardState("error", "Please enter a GitHub username.");
       return;
     }
-    
-    // Prevent multiple simultaneous requests
-    if (isLoading) {
-      setStatus("Please wait, loading in progress...", "error");
+
+    if (requestInFlight) {
+      setDashboardState("error", "Dashboard is already loading. Please wait.");
       return;
     }
-    
-    // Rate limiting check
-    if (!API_TRACKER.canCall()) {
-      setStatus("Please wait a moment before making another request.", "error");
-      return;
-    }
-    
-    // Save only username
-    localStorage.setItem("xaytheon:ghCreds", JSON.stringify({ username }));
-    loadGithubDashboard(username).finally(() => {
-      isLoading = false;
-    });
+
+    localStorage.setItem(
+      "xaytheon:ghCreds",
+      JSON.stringify({ username })
+    );
+
+    loadGithubDashboard(username);
   });
 
-  clearBtn.addEventListener("click", () => {
-    // Remove saved username
+  document.getElementById("gh-clear").addEventListener("click", () => {
+    if (requestInFlight) return;
+
     localStorage.removeItem("xaytheon:ghCreds");
-    // Clear cache
     GITHUB_CACHE.clear();
-    // Clear input field
-    const usernameInput = document.getElementById("gh-username");
-    if (usernameInput) usernameInput.value = "";
-
-    // Clear all visible dashboard panels
-    const set = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
-    };
-    const setHtml = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = val;
-    };
-    const avatar = document.getElementById("gh-avatar");
-    if (avatar) avatar.removeAttribute("src");
-    set("gh-name", "—");
-    set("gh-login", "—");
-    set("gh-bio", "");
-    set("gh-followers", "0");
-    set("gh-following", "0");
-    set("gh-repos-count", "0");
-    setHtml("gh-repo-list", "");
-    setHtml("gh-activity-list", "");
-    setHtml("gh-contrib-svg", "");
-    const note = document.getElementById("gh-contrib-note");
-    if (note) note.textContent = "Enter a username and press Load Dashboard.";
-    setStatus("Cleared saved username and dashboard.");
+    usernameInput.value = "";
+    setDashboardState("idle", "Dashboard cleared.");
   });
-
-  function setStatus(msg, level = "info") {
-    if (!status) return;
-    status.textContent = msg;
-    status.style.opacity = 1;
-    status.style.color = level === "error" ? "#b91c1c" : "#111827";
-    setTimeout(() => {
-      status.style.opacity = 0.8;
-    }, 2500);
-  }
 }
 
+// ---------------- LOAD DASHBOARD ----------------
 async function loadGithubDashboard(username) {
-  const headers = {};
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  };
-  const setHtml = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = val;
-  };
-  const setDisplay = (id, disp) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = disp;
-  };
-  const avatar = document.getElementById("gh-avatar");
+  requestInFlight = true;
+  setDashboardState("loading", "Loading GitHub dashboard…");
 
-  // Status
-  const status = document.getElementById("github-status");
-  const statusMsg = (m, level = "info") => {
-    if (status) {
-      status.textContent = m;
-      status.style.color = level === "error" ? "#b91c1c" : "#111827";
-    }
-  };
-  
-  // Disable submit button during load
-  const submitBtn = document.querySelector('#github-form button[type="submit"]');
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Loading...';
-  }
-
-  // Check cache first
   const cacheKey = `dashboard:${username}`;
   const cached = GITHUB_CACHE.get(cacheKey);
-  
+
   if (cached) {
-    statusMsg("Loading from cache (fetching fresh data in background)...");
     renderDashboardData(cached, username);
-    // Fetch fresh data in background
-    fetchAndCacheDashboard(username).catch(console.error);
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Load Dashboard';
-    }
+    setDashboardState(
+      "success",
+      "Loaded from cache • refreshing in background ♻️"
+    );
+    requestInFlight = false;
+    fetchAndCacheDashboard(username);
     return;
   }
 
   try {
-    API_TRACKER.recordCall();
-    statusMsg("Loading profile…");
-    // Profile
     const user = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(username)}`,
-      headers
+      `https://api.github.com/users/${username}`
     );
-    if (avatar) avatar.src = user.avatar_url;
-    set("gh-name", user.name || "—");
-    set("gh-login", `@${user.login}`);
-    set("gh-bio", user.bio || "");
-    set("gh-followers", user.followers ?? 0);
-    set("gh-following", user.following ?? 0);
 
-    // Repos (public) - paginated, we fetch top 100 then sort by stargazers
-    statusMsg("Loading repositories…");
     const repos = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(
-        username
-      )}/repos?per_page=100&sort=updated`,
-      headers
+      `https://api.github.com/users/${username}/repos?per_page=100`
     );
-    set("gh-repos-count", (user.public_repos ?? repos.length) + "");
-    const top = [...repos]
-      .filter((r) => !r.fork)
-      .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
-      .slice(0, 8);
-    renderRepos(top);
 
-    // Activity (public events)
-    statusMsg("Loading activity…");
     const events = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(
-        username
-      )}/events/public?per_page=25`,
-      headers
+      `https://api.github.com/users/${username}/events/public?per_page=25`
     );
-    renderActivity(events.slice(0, 10));
 
-    // Contributions: tokenless path — try third-party full-year chart, fallback to approximate heatmap
-    const contribNote = document.getElementById("gh-contrib-note");
-    const container = document.getElementById("gh-contrib-svg");
-    if (contribNote)
-      contribNote.textContent =
-        "Full-year chart via third-party (ghchart.rshah.org). If it fails, we will show an approximate heatmap.";
-    setDisplay("gh-contrib-note", "block");
-    if (container) {
-      container.innerHTML =
-        '<div class="muted">Loading public contributions…</div>';
-      const img = new Image();
-      img.src = `https://ghchart.rshah.org/${encodeURIComponent(username)}`;
-      img.alt = `${username}'s contributions (third-party chart)`;
-      img.style.maxWidth = "100%";
-      img.style.height = "auto";
-      img.referrerPolicy = "no-referrer";
-      img.onload = () => {
-        container.innerHTML = "";
-        container.appendChild(img);
-      };
-      img.onerror = () => {
-        try {
-          const svg = renderEventHeatmap(events);
-          container.innerHTML = svg;
-          if (contribNote)
-            contribNote.textContent =
-              "Approximate heatmap based on recent public activity.";
-        } catch (e) {
-          console.warn("Event heatmap failed", e);
-          container.innerHTML =
-            '<div class="muted">No activity found to render a heatmap.</div>';
-        }
-      };
-    }
+    const topRepos = repos
+      .filter((r) => !r.fork)
+      .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      .slice(0, 8);
 
-    // Cache the data
-    const dashboardData = {
+    const data = {
       user,
-      repos: top,
+      repos: topRepos,
       events: events.slice(0, 10),
-      fetchedAt: Date.now()
     };
-    GITHUB_CACHE.set(cacheKey, dashboardData);
 
-    statusMsg("Done");
+    GITHUB_CACHE.set(cacheKey, data);
+    renderDashboardData(data, username);
+    setDashboardState("success", "Dashboard loaded successfully ✅");
   } catch (e) {
-    console.error(e);
-    statusMsg(e.message || "Failed to load GitHub data", "error");
+    setDashboardState(
+      "error",
+      e.message || "Failed to load GitHub data"
+    );
   } finally {
-    // Re-enable submit button
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Load Dashboard';
-    }
+    requestInFlight = false;
   }
 }
 
-// Helper function to fetch and cache dashboard data
-async function fetchAndCacheDashboard(username) {
-  const headers = {};
-  const cacheKey = `dashboard:${username}`;
-  
-  try {
-    const user = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(username)}`,
-      headers
-    );
-    
-    const repos = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(
-        username
-      )}/repos?per_page=100&sort=updated`,
-      headers
-    );
-    
-    const top = [...repos]
-      .filter((r) => !r.fork)
-      .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
-      .slice(0, 8);
-    
-    const events = await ghJson(
-      `https://api.github.com/users/${encodeURIComponent(
-        username
-      )}/events/public?per_page=25`,
-      headers
-    );
-    
-    const dashboardData = {
-      user,
-      repos: top,
-      events: events.slice(0, 10),
-      fetchedAt: Date.now()
-    };
-    
-    GITHUB_CACHE.set(cacheKey, dashboardData);
-    renderDashboardData(dashboardData, username);
-    
-    const status = document.getElementById("github-status");
-    if (status) {
-      status.textContent = "Updated with fresh data";
-      status.style.color = "#059669";
-    }
-  } catch (e) {
-    console.warn("Background fetch failed:", e);
-  }
-}
 
 // Helper function to render cached dashboard data
 function renderDashboardData(data, username) {

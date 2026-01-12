@@ -265,10 +265,10 @@
   // Debounced update function
   const debouncedUpdate = debounce(async function update(){
     const filters = {
-      language: (langEl.value||'').trim(),
-      topic: (topicEl.value||'').trim(),
-      days: parseInt(windowEl.value||'30',10) || 30,
-      k: Math.max(1, Math.min(20, parseInt(kEl.value||'10',10)))
+      language,
+      topic,
+      days,
+      k: Math.max(1, Math.min(20, k))
     };
     const cacheKey = keyFor(filters);
     

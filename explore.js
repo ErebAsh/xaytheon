@@ -348,7 +348,28 @@
 
     const base = topicEl.value.trim() || "threejs";
     const lang = langEl.value.trim();
-    const limit = Math.min(100, Math.max(10, Number(limitEl.value)));
+    const limitValue = limitEl.value.trim();
+
+    // Validate topic
+    if (base.length > 50) {
+      setStatus("Topic must be 50 characters or less.", "error");
+      return;
+    }
+
+    // Validate language
+    if (lang && lang.length > 20) {
+      setStatus("Language must be 20 characters or less.", "error");
+      return;
+    }
+
+    // Validate limit
+    const limitNum = Number(limitValue);
+    if (isNaN(limitNum) || limitNum < 10 || limitNum > 100) {
+      setStatus("Limit must be a number between 10 and 100.", "error");
+      return;
+    }
+
+    const limit = Math.min(100, Math.max(10, limitNum));
 
     addNode(`topic:${base}`, { type: "topic", label: base });
 
