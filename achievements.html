@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Track your achievements, earn badges, and climb the XP leaderboard on XAYTHEON." />
+    <title>Achievements & Leaderboard — XAYTHEON</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="achievements.css" />
+
+    <!-- Supabase SDK & auth bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
+    <script defer src="auth.js"></script>
+</head>
+
+<body class="eightgon-page">
+    <div class="page-wrapper">
+
+        <nav class="navbar">
+            <div class="nav-container">
+                <a class="logo" href="index.html" aria-label="Back to Home">
+                    <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
+                </a>
+                <ul class="nav-menu">
+                    <li><a class="nav-link" href="index.html#home">Home</a></li>
+                    <li><a class="nav-link" href="github.html">GitHub Dashboard</a></li>
+                    <li><a class="nav-link" href="analytics.html">Analytics</a></li>
+                    <li><a class="nav-link" href="watchlist.html">Watchlist</a></li>
+                    <li><a class="nav-link active" href="achievements.html">Achievements</a></li>
+                    <li><a class="nav-link" href="community.html">Community</a></li>
+                    <li>
+                        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                            <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg>
+                        </button>
+                    </li>
+                    <li id="auth-area"></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main>
+            <section id="achievements" class="achievements-section">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="achievements-header">
+                        <div>
+                            <h1 class="section-title">🏆 Achievements & Leaderboard</h1>
+                            <p class="section-subtitle">Earn badges, collect XP, and compete with the community</p>
+                        </div>
+                    </div>
+
+                    <!-- Auth Warning -->
+                    <div id="auth-warning" class="warning-card" style="display: none;">
+                        <div class="warning-icon">⚠️</div>
+                        <div>
+                            <h3>Sign In to Track Progress</h3>
+                            <p>Please <a href="login.html">sign in</a> to unlock achievements and track your XP
+                                progress.</p>
+                        </div>
+                    </div>
+
+                    <!-- User Stats Panel -->
+                    <div class="user-stats-panel" id="user-stats-panel">
+                        <div class="xp-card">
+                            <div class="level-badge" id="level-badge">
+                                <span class="level-number">1</span>
+                                <span class="level-label">LEVEL</span>
+                            </div>
+                            <div class="xp-info">
+                                <div class="xp-bar-container">
+                                    <div class="xp-bar" id="xp-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="xp-text">
+                                    <span id="current-xp">0</span> / <span id="next-level-xp">100</span> XP
+                                </div>
+                            </div>
+                            <div class="streak-info">
+                                <div class="streak-flame">🔥</div>
+                                <div>
+                                    <span class="streak-count" id="streak-count">0</span>
+                                    <span class="streak-label">day streak</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quick-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="achievements-unlocked">0</span>
+                                <span class="stat-label">Unlocked</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="total-achievements">0</span>
+                                <span class="stat-label">Total</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="user-rank">#-</span>
+                                <span class="stat-label">Rank</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="badges">🏅 Badges</button>
+                        <button class="tab-btn" data-tab="leaderboard">🏆 Leaderboard</button>
+                        <button class="tab-btn" data-tab="activity">📊 XP Activity</button>
+                    </div>
+
+                    <!-- Badges Tab -->
+                    <div class="tab-content active" id="badges-tab">
+                        <!-- Category Filters -->
+                        <div class="category-filters">
+                            <button class="filter-btn active" data-category="all">All</button>
+                            <button class="filter-btn" data-category="stars">⭐ Stars</button>
+                            <button class="filter-btn" data-category="repos">📦 Repos</button>
+                            <button class="filter-btn" data-category="social">👥 Social</button>
+                            <button class="filter-btn" data-category="commits">💻 Commits</button>
+                            <button class="filter-btn" data-category="streak">🔥 Streak</button>
+                            <button class="filter-btn" data-category="special">🎁 Special</button>
+                        </div>
+
+                        <!-- Badges Grid -->
+                        <div class="badges-grid" id="badges-grid">
+                            <!-- Badges will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard Tab -->
+                    <div class="tab-content" id="leaderboard-tab">
+                        <div class="leaderboard-container">
+                            <div class="leaderboard-podium" id="leaderboard-podium">
+                                <!-- Top 3 will be populated here -->
+                            </div>
+                            <div class="leaderboard-list" id="leaderboard-list">
+                                <!-- Remaining positions will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div class="tab-content" id="activity-tab">
+                        <div class="activity-list" id="activity-list">
+                            <!-- XP activity will be populated here -->
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <span class="logo-text">XAYTHEON</span>
+                        <p>Empowering the next generation of innovators</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <div class="cursor-container">
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+            <span class="cursor-dot"></span>
+        </div>
+
+    </div>
+
+    <!-- Achievement Unlock Modal -->
+    <div id="unlock-modal" class="modal" style="display: none;">
+        <div class="modal-content unlock-modal-content">
+            <div class="unlock-animation">
+                <div class="unlock-badge" id="unlock-badge-icon">🏆</div>
+                <div class="unlock-particles"></div>
+            </div>
+            <h2>Achievement Unlocked!</h2>
+            <h3 id="unlock-badge-name">Badge Name</h3>
+            <p id="unlock-badge-desc">Badge description</p>
+            <div class="unlock-xp">+<span id="unlock-xp-amount">10</span> XP</div>
+            <button class="btn btn-primary" onclick="closeUnlockModal()">Awesome!</button>
+        </div>
+    </div>
+
+    <!-- Main app script -->
+    <script src="script.js"></script>
+    <!-- Achievements-specific script -->
+    <script src="achievements.js"></script>
+</body>
+
+</html>

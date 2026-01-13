@@ -34,6 +34,28 @@ exports.verifyAccessToken = (req, res, next) => {
   }
 };
 
+// Optional authentication - extracts user ID if token present, but doesn't require it
+exports.optionalAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      if (token && token.length <= 1000) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        if (decoded.type === "access") {
+          req.userId = decoded.id;
+        }
+      }
+    }
+  } catch (err) {
+    // Token invalid or expired - just continue without user ID
+  }
+
+  next();
+};
+
 exports.loginRateLimiter = (() => {
   const attempts = new Map();
   const MAX_ATTEMPTS = 100; // Increased for development/testing

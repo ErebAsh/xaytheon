@@ -8,6 +8,7 @@ const userRoutes = require("./routes/user.routes");
 const watchlistRoutes = require("./routes/watchlist.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
+const achievementsRoutes = require("./routes/achievements.routes");
 
 const app = express();
 
@@ -93,9 +94,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/watchlists", watchlistRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/analytics", analyticsRoutes);
-
-// Global error handling middleware
-// app.use(handleValidationError);
+app.use("/api/achievements", achievementsRoutes);
 
 app.use((err, req, res, next) => {
   console.error("Error:", err);
