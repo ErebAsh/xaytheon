@@ -10,6 +10,7 @@
   <!-- Supabase SDK & Auth (for navbar/gating if needed) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
   <script defer src="auth.js"></script>
+  <script defer src="i18n.js"></script>
 </head>
 <button id="scrollTopBtn" aria-label="Scroll to top">
   ↑
@@ -23,13 +24,14 @@
           <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
         </a>
         <ul class="nav-menu">
-          <li><a class="nav-link" href="index.html#home">Home</a></li>
-          <li><a class="nav-link" href="github.html">GitHub Dashboard</a></li>
-          <li><a class="nav-link" href="analytics.html">Analytics</a></li>
-          <li><a class="nav-link" href="watchlist.html">Watchlist</a></li>
-          <li><a class="nav-link" href="achievements.html">Achievements</a></li>
-          <li><a class="nav-link" href="contributions.html">Contributions</a></li>
-          <li><a class="nav-link" href="explore.html">Explore by Topic</a></li>
+          <li><a class="nav-link" href="index.html#home" data-i18n="nav.home">Home</a></li>
+          <li><a class="nav-link" href="github.html" data-i18n="nav.dashboard">GitHub Dashboard</a></li>
+          <li><a class="nav-link" href="analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a class="nav-link" href="watchlist.html" data-i18n="nav.watchlist">Watchlist</a></li>
+          <li><a class="nav-link" href="achievements.html" data-i18n="nav.achievements">Achievements</a></li>
+          <li><a class="nav-link" href="community.html" data-i18n="nav.community">Community Highlights</a></li>
+          <li><a class="nav-link" href="contributions.html" data-i18n="nav.contributions">Contributions</a></li>
+          <li><a class="nav-link" href="explore.html" data-i18n="nav.explore">Explore by Topic</a></li>
           <li>
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
               <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -54,11 +56,12 @@
     <main>
       <section class="github-section">
         <div class="container">
-          <h2 class="section-title" style="font-family:'Eightgon',sans-serif;">Community Highlights</h2>
+          <h2 class="section-title" style="font-family:'Eightgon',sans-serif;" data-i18n="community.title">Community
+            Highlights</h2>
 
           <div class="card" style="grid-column: 1 / -1;">
             <div class="card-header">
-              <h3>Trending Now</h3>
+              <h3 data-i18n="community.trending">Trending Now</h3>
             </div>
             <div class="card-body">
               <form id="trend-form" class="github-form" autocomplete="off" style="margin-bottom: 16px;">
@@ -92,8 +95,9 @@
                   <label for="trend-k">Top K</label>
                   <input id="trend-k" type="number" min="1" max="20" value="10" />
                 </div>
-                <button class="btn btn-primary" type="submit">Update</button>
-                <button class="btn btn-outline" type="button" id="trend-reset">Reset</button>
+                <button class="btn btn-primary" type="submit" data-i18n="common.submit">Update</button>
+                <button class="btn btn-outline" type="button" id="trend-reset"
+                  data-i18n="common.tryAgain">Reset</button>
                 <div id="trend-status" class="github-status" aria-live="polite"></div>
                 <div id="trend-cache-info" class="github-status" aria-live="polite"
                   style="margin-top: 8px; font-size: 0.9em; color: #6b7280;"></div>
@@ -127,11 +131,11 @@
       <div class="footer-content">
         <div class="footer-brand">
           <span class="logo-text">XAYTHEON</span>
-          <p>Empowering the next generation of innovators</p>
+          <p data-i18n="footer.tagline">Empowering the next generation of innovators</p>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+        <p data-i18n="footer.copyright">&copy; 2026 XAYTHEON. All rights reserved.</p>
       </div>
     </div>
   </footer>

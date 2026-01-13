@@ -9,6 +9,7 @@
   <!-- Supabase SDK & auth bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
   <script defer src="auth.js"></script>
+  <script defer src="i18n.js"></script>
   <script>
     const theme = localStorage.getItem("theme")
     if (theme) {
@@ -409,13 +410,14 @@
           <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
         </a>
         <ul class="nav-menu">
-          <li><a class="nav-link" href="index.html#home">Home</a></li>
-          <li><a class="nav-link" href="analytics.html">Analytics</a></li>
-          <li><a class="nav-link" href="watchlist.html">Watchlist</a></li>
-          <li><a class="nav-link" href="achievements.html">Achievements</a></li>
-          <li><a class="nav-link" href="community.html">Community Highlights</a></li>
-          <li><a class="nav-link" href="explore.html">Explore by Topic</a></li>
-          <li><a class="nav-link" href="contributions.html">Contributions</a></li>
+          <li><a class="nav-link" href="index.html#home" data-i18n="nav.home">Home</a></li>
+          <li><a class="nav-link" href="github.html" data-i18n="nav.dashboard">GitHub Dashboard</a></li>
+          <li><a class="nav-link" href="analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a class="nav-link" href="watchlist.html" data-i18n="nav.watchlist">Watchlist</a></li>
+          <li><a class="nav-link" href="achievements.html" data-i18n="nav.achievements">Achievements</a></li>
+          <li><a class="nav-link" href="community.html" data-i18n="nav.community">Community Highlights</a></li>
+          <li><a class="nav-link" href="explore.html" data-i18n="nav.explore">Explore by Topic</a></li>
+          <li><a class="nav-link" href="contributions.html" data-i18n="nav.contributions">Contributions</a></li>
           <li>
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
               <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -441,7 +443,11 @@
       <section id="github" class="github-section">
         <div class="container">
           <div class="github-header">
-            <h2 class="section-title">GitHub Dashboard</h2>
+            <h2 class="section-title" data-i18n="dashboard.title">GitHub Dashboard</h2>
+            <div class="mini-3d" aria-hidden="true">
+              <canvas id="mini-3d-canvas"></canvas>
+              <div class="mini-3d-loading" data-i18n="common.loading">Loading…</div>
+            </div>
           </div>
 
           <form id="github-form" class="github-form" autocomplete="off">
@@ -455,20 +461,21 @@
             </div>
 
             <div class="field-group" style="grid-column: span 6;">
-              <label for="gh-username">Username</label>
-              <input id="gh-username" name="username" type="text" placeholder="e.g. octocat" />
+              <label for="gh-username" data-i18n="auth.signup.username">Username</label>
+              <input id="gh-username" name="username" type="text" placeholder="e.g. octocat"
+                data-i18n="dashboard.enterUsername" />
             </div>
-            <button class="btn btn-primary" type="submit">Load Dashboard</button>
-            <button class="btn btn-outline" type="button" id="gh-clear">Clear Cache & Data</button>
+            <button class="btn btn-primary" type="submit" data-i18n="dashboard.fetchData">Load Dashboard</button>
+            <button class="btn btn-outline" type="button" id="gh-clear" data-i18n="common.delete">Clear Cache &
+              Data</button>
             <div id="github-status" class="github-status" aria-live="polite"></div>
           </form>
 
           <div class="github-grid">
-            <!-- Left Column: Profile & Activity -->
             <div>
               <div class="card profile-card" id="gh-profile">
                 <div class="card-header">
-                  <h3>Profile</h3>
+                  <h3 data-i18n="nav.profile">Profile</h3>
                 </div>
                 <div class="card-body">
                   <div class="profile-row">
@@ -480,16 +487,19 @@
                     </div>
                   </div>
                   <div class="profile-stats">
-                    <div><span id="gh-followers">0</span><label>Followers</label></div>
-                    <div><span id="gh-following">0</span><label>Following</label></div>
-                    <div><span id="gh-repos-count">0</span><label>Repos</label></div>
+                    <div><span id="gh-followers">0</span><label data-i18n="dashboard.stats.followers">Followers</label>
+                    </div>
+                    <div><span id="gh-following">0</span><label data-i18n="dashboard.stats.following">Following</label>
+                    </div>
+                    <div><span id="gh-repos-count">0</span><label data-i18n="dashboard.stats.repositories">Repos</label>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div class="card contributions-card" id="gh-contributions">
                 <div class="card-header">
-                  <h3>Contributions</h3>
+                  <h3 data-i18n="nav.contributions">Contributions</h3>
                 </div>
                 <div class="card-body">
                   <div id="gh-contrib-note" class="muted">Public contributions chart is shown below. If it's
@@ -500,8 +510,8 @@
 
               <div class="card repos-card" id="gh-repos" data-requires-auth style="display:none;">
                 <div class="card-header">
-                  <h3>Top Repositories</h3>
-                  <div class="muted small">Sorted by stars</div>
+                  <h3 data-i18n="dashboard.topRepositories">Top Repositories</h3>
+                  <div class="muted small" data-i18n="common.sortBy">Sorted by stars</div>
                 </div>
                 <div class="card-body">
                   <div id="gh-repo-list" class="repo-list"></div>
@@ -510,81 +520,84 @@
 
               <div class="card activity-card" id="gh-activity" data-requires-auth style="display:none;">
                 <div class="card-header">
-                  <h3>Recent Activity</h3>
-                  <div class="muted small">Public events</div>
+                  <h3 data-i18n="dashboard.recentActivity">Recent Activity</h3>
+                  <div class="muted small" data-i18n="dashboard.recentActivity">Public events</div>
                 </div>
                 <div class="card-body">
                   <ul id="gh-activity-list" class="activity-list"></ul>
                 </div>
               </div>
             </div>
-
-            <!-- Right Column: History Tracker -->
-            <div class="history-tracker">
-              <div class="card trend-card">
-                <div class="card-header">
-                  <h3>📈 Metrics Trends</h3>
-                  <div class="muted small">Compared to previous snapshot</div>
-                </div>
-                <div class="card-body">
-                  <div id="metrics-trends">
-                    <div class="muted">Load a dashboard to see trends</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="card-header">
-                  <h3>📊 Growth Chart</h3>
-                  <div class="muted small">Last 30 snapshots</div>
-                </div>
-                <div class="card-body">
-                  <canvas id="history-chart" class="history-chart"></canvas>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="card-header">
-                  <h3>🕐 Snapshot History</h3>
-                  <div class="muted small">Recent captures</div>
-                </div>
-                <div class="card-body">
-                  <div id="snapshot-list" class="snapshot-list">
-                    <div class="muted">No snapshots yet</div>
-                  </div>
-                  <button id="clear-history" class="clear-history-btn">Clear History</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="cursor-container">
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
-            <span class="cursor-dot"></span>
           </div>
         </div>
-      </section>
-    </main>
+  </div>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-brand">
-            <span class="logo-text">XAYTHEON</span>
-            <p>Empowering the next generation of innovators</p>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+  <!-- Right Column: History Tracker -->
+  <div class="history-tracker">
+    <div class="card trend-card">
+      <div class="card-header">
+        <h3>📈 Metrics Trends</h3>
+        <div class="muted small">Compared to previous snapshot</div>
+      </div>
+      <div class="card-body">
+        <div id="metrics-trends">
+          <div class="muted">Load a dashboard to see trends</div>
         </div>
       </div>
-    </footer>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>📊 Growth Chart</h3>
+        <div class="muted small">Last 30 snapshots</div>
+      </div>
+      <div class="card-body">
+        <canvas id="history-chart" class="history-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>🕐 Snapshot History</h3>
+        <div class="muted small">Recent captures</div>
+      </div>
+      <div class="card-body">
+        <div id="snapshot-list" class="snapshot-list">
+          <div class="muted">No snapshots yet</div>
+        </div>
+        <button id="clear-history" class="clear-history-btn">Clear History</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="cursor-container">
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+    <span class="cursor-dot"></span>
+  </div>
+  </div>
+  </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="logo-text">XAYTHEON</span>
+          <p data-i18n="footer.tagline">Empowering the next generation of innovators</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p data-i18n="footer.copyright">&copy; 2026 XAYTHEON. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
   </div>
 
   <!-- Chart.js for visualization -->

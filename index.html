@@ -11,6 +11,7 @@
     <!-- Supabase SDK & auth bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
     <script defer src="auth.js"></script>
+    <script defer src="i18n.js"></script>
 </head>
 
 <body>
@@ -21,7 +22,7 @@
         <!-- Loading Screen -->
         <div id="loading-screen" class="loading-screen" role="status" aria-live="polite">
             <div class="loader" aria-hidden="true"></div>
-            <p>Initializing XAYTHEON...</p>
+            <p data-i18n="common.loading">Initializing XAYTHEON...</p>
         </div>
 
     </div>
@@ -36,13 +37,15 @@
                 </a>
 
                 <ul class="nav-menu">
-                    <li><a class="nav-link" href="github.html">GitHub Dashboard</a></li>
-                    <li><a class="nav-link" href="analytics.html">Analytics</a></li>
-                    <li><a class="nav-link" href="watchlist.html">Watchlist</a></li>
-                    <li><a class="nav-link" href="achievements.html">Achievements</a></li>
-                    <li><a class="nav-link" href="community.html">Community Highlights</a></li>
-                    <li><a class="nav-link" href="explore.html">Explore by Topic</a></li>
-                    <li><a class="nav-link" href="contributions.html">Contributions</a></li>
+                    <li><a class="nav-link" href="github.html" data-i18n="nav.dashboard">GitHub Dashboard</a></li>
+                    <li><a class="nav-link" href="analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+                    <li><a class="nav-link" href="watchlist.html" data-i18n="nav.watchlist">Watchlist</a></li>
+                    <li><a class="nav-link" href="achievements.html" data-i18n="nav.achievements">Achievements</a></li>
+                    <li><a class="nav-link" href="community.html" data-i18n="nav.community">Community Highlights</a>
+                    </li>
+                    <li><a class="nav-link" href="explore.html" data-i18n="nav.explore">Explore by Topic</a></li>
+                    <li><a class="nav-link" href="contributions.html" data-i18n="nav.contributions">Contributions</a>
+                    </li>
                     <li>
                         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                             <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -72,12 +75,12 @@
             <section id="home" class="hero">
                 <div class="hero-content">
                     <h1 class="hero-title">
-                        <span class="title-line">Welcome to</span>
+                        <span class="title-line" data-i18n="home.hero.title">Welcome to</span>
 
                         <span class="title-main title-main--logo">
                             <img src="assets/logo/thelogo.png"
                                 onerror="this.onerror=null;this.src='assets/logo/thelogo.png'" alt="XAYTHEON"
-                                class="title-logo-img" />
+                                class="title-logo-img" data-i18n="title" />
                         </span>
 
                         <!-- FIX APPLIED HERE -->
@@ -104,15 +107,16 @@
             <section data-requires-auth style="display:none; padding-top:0;">
                 <div class="container">
                     <div id="recommendations-area" class="hidden">
-                        <h2 class="section-title">Recommended for You</h2>
-                        <p class="section-subtitle">Based on your viewing history</p>
+                        <h2 class="section-title" data-i18n="home.recommendationsTitle">Recommended for You</h2>
+                        <p class="section-subtitle" data-i18n="home.recommendationsSubtitle">Based on your viewing
+                            history</p>
                         <div id="rec-list" class="grid-3">
                             <!-- Recommendations will be injected here -->
                         </div>
                     </div>
 
                     <div class="empty-rec-state hidden" id="rec-empty">
-                        <div class="muted" style="margin-top:20px;">
+                        <div class="muted" style="margin-top:20px;" data-i18n="home.emptyRecState">
                             Start exploring repositories to get personalized recommendations!
                         </div>
                     </div>
@@ -126,7 +130,7 @@
                 <div class="footer-content">
                     <div class="footer-brand">
                         <span class="logo-text">XAYTHEON</span>
-                        <p>Empowering the next generation of innovators</p>
+                        <p data-i18n="footer.tagline">Empowering the next generation of innovators</p>
                     </div>
                     <div class="footer-socials">
                         <a href="https://github.com/Saatvik-GT/xaytheon" target="_blank" aria-label="GitHub">
@@ -143,7 +147,7 @@
                     <span class="footer-label">XAYTHEON</span>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+                    <p data-i18n="footer.copyright">&copy; 2026 XAYTHEON. All rights reserved.</p>
                 </div>
             </div>
         </footer>

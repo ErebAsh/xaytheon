@@ -87,10 +87,12 @@ body {
   --link-color: #93c5fd;
   --link-hover: #bfdbfe;
 }
+
 /* Dark mode: make eye icon visible */
 [data-theme="dark"] .toggle-password img {
   filter: invert(1);
 }
+
 /* Fix low-contrast status text in dark mode */
 [data-theme="dark"] .github-status {
   color: #e5e7eb !important;
@@ -265,6 +267,7 @@ body.eightgon-page {
   align-items: center;
   height: 70px;
 }
+
 .nav-right {
   display: flex;
   align-items: center;
@@ -443,6 +446,186 @@ body.eightgon-page {
 
 .theme-toggle:hover svg {
   transform: rotate(15deg);
+}
+
+/* Language Switcher */
+.lang-switcher {
+  position: relative;
+  margin: 0 10px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+  background: var(--border-color);
+  border-color: var(--border-color-strong);
+}
+
+.lang-code {
+  font-family: "OriginTech", sans-serif;
+  letter-spacing: 1px;
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  padding: 8px;
+  min-width: 140px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+.lang-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lang-dropdown li {
+  margin: 2px 0;
+}
+
+.lang-dropdown a {
+  display: block;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.95em;
+  transition: all 0.2s ease;
+}
+
+.lang-dropdown a:hover {
+  background: var(--border-color);
+  color: var(--accent-blue);
+}
+
+.lang-dropdown a.active {
+  background: var(--accent-blue-glow);
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .nav-container {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .nav-menu {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .lang-dropdown {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .mini-3d {
+  right: auto;
+  left: -80px;
+}
+
+[dir="rtl"] .hero-buttons {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .ri-arrow-right-line {
+  transform: rotate(180deg);
+}
+
+[dir="rtl"] .ri-arrow-left-line {
+  transform: rotate(180deg);
+}
+
+[dir="rtl"] .logo-text {
+  letter-spacing: normal;
+}
+
+[dir="rtl"] .field-group label {
+  text-align: right;
+  display: block;
+}
+
+[dir="rtl"] .btn i {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+[dir="rtl"] .metric-card {
+  text-align: right;
+}
+
+[dir="rtl"] .metric-icon {
+  margin-left: 12px;
+  margin-right: 0;
+}
+
+[dir="rtl"] .card-header h3 {
+  text-align: right;
+}
+
+[dir="rtl"] .footer-content {
+  text-align: right;
+}
+
+[dir="rtl"] .footer-brand p {
+  text-align: right;
+}
+
+/* Fix for icons and text order in RTL */
+[dir="rtl"] .btn {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .lang-btn {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .lang-btn i:first-child {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+[dir="rtl"] .lang-code {
+  margin: 0 4px;
+}
+
+/* Animations for language switch */
+.lang-switching {
+  pointer-events: none;
+}
+
+.lang-switching .content {
+  opacity: 0.5;
+  filter: blur(2px);
+  transition: all 0.3s ease;
 }
 
 /* Hero Section */

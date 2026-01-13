@@ -9,6 +9,7 @@ const watchlistRoutes = require("./routes/watchlist.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 const achievementsRoutes = require("./routes/achievements.routes");
+const i18nRoutes = require("./routes/i18n.routes");
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use("/api/watchlists", watchlistRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/achievements", achievementsRoutes);
+app.use("/api/i18n", i18nRoutes);
 
 app.use((err, req, res, next) => {
   console.error("Error:", err);

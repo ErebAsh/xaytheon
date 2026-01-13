@@ -88,7 +88,7 @@ exports.login = async (req, res) => {
     res.json({
       accessToken,
       refreshToken, // Return in body for localStorage fallback
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, email: user.email, preferred_language: user.preferred_language },
       expiresIn: 15 * 60,
       message: "Login successful"
     });
@@ -133,7 +133,7 @@ exports.refresh = async (req, res) => {
     res.json({
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken, // Return new refresh token
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, email: user.email, preferred_language: user.preferred_language },
       expiresIn: 15 * 60,
       message: "Token refreshed successfully"
     });

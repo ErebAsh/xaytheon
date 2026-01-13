@@ -17,6 +17,7 @@
     <!-- Supabase SDK & auth bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
     <script defer src="auth.js"></script>
+    <script defer src="i18n.js"></script>
 </head>
 
 <body class="eightgon-page">
@@ -28,12 +29,14 @@
                     <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
                 </a>
                 <ul class="nav-menu">
-                    <li><a class="nav-link" href="index.html#home">Home</a></li>
-                    <li><a class="nav-link" href="github.html">GitHub Dashboard</a></li>
-                    <li><a class="nav-link" href="analytics.html">Analytics</a></li>
-                    <li><a class="nav-link" href="community.html">Community Highlights</a></li>
-                    <li><a class="nav-link" href="explore.html">Explore by Topic</a></li>
-                    <li><a class="nav-link" href="contributions.html">Contributions</a></li>
+                    <li><a class="nav-link" href="index.html#home" data-i18n="nav.home">Home</a></li>
+                    <li><a class="nav-link" href="github.html" data-i18n="nav.dashboard">GitHub Dashboard</a></li>
+                    <li><a class="nav-link" href="analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+                    <li><a class="nav-link" href="community.html" data-i18n="nav.community">Community Highlights</a>
+                    </li>
+                    <li><a class="nav-link" href="explore.html" data-i18n="nav.explore">Explore by Topic</a></li>
+                    <li><a class="nav-link" href="contributions.html" data-i18n="nav.contributions">Contributions</a>
+                    </li>
                     <li>
                         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
                             <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -72,7 +75,7 @@
                     <!-- Sidebar -->
                     <aside class="watchlist-sidebar">
                         <div class="sidebar-header">
-                            <h2>📋 Watchlists</h2>
+                            <h2 data-i18n="watchlist.title">📋 Watchlists</h2>
                             <button class="btn btn-primary btn-sm" id="create-watchlist-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
@@ -118,11 +121,12 @@
                             <!-- Header -->
                             <div class="watchlist-header">
                                 <div>
-                                    <h1 id="watchlist-title">My Watchlist</h1>
-                                    <p id="watchlist-description" class="text-muted"></p>
+                                    <h1 id="watchlist-title" data-i18n="watchlist.title">My Watchlist</h1>
+                                    <p id="watchlist-description" class="text-muted" data-i18n="watchlist.subtitle"></p>
                                 </div>
                                 <div class="watchlist-actions">
-                                    <button class="btn btn-outline btn-sm" id="add-repo-btn">
+                                    <button class="btn btn-outline btn-sm" id="add-repo-btn"
+                                        data-i18n="watchlist.addRepo">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -180,11 +184,11 @@
                 <div class="footer-content">
                     <div class="footer-brand">
                         <span class="logo-text">XAYTHEON</span>
-                        <p>Empowering the next generation of innovators</p>
+                        <p data-i18n="footer.tagline">Empowering the next generation of innovators</p>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+                    <p data-i18n="footer.copyright">&copy; 2026 XAYTHEON. All rights reserved.</p>
                 </div>
             </div>
         </footer>

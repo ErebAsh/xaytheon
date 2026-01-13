@@ -10,6 +10,7 @@
   <!-- Supabase SDK & Auth -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
   <script defer src="auth.js"></script>
+  <script defer src="i18n.js"></script>
 </head>
 
 <body class="eightgon-page">
@@ -20,13 +21,13 @@
           <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo" />
         </a>
         <ul class="nav-menu">
-          <li><a class="nav-link" href="index.html#home">Home</a></li>
-          <li><a class="nav-link" href="github.html">GitHub Dashboard</a></li>
-          <li><a class="nav-link" href="analytics.html">Analytics</a></li>
-          <li><a class="nav-link" href="watchlist.html">Watchlist</a></li>
-          <li><a class="nav-link" href="achievements.html">Achievements</a></li>
-          <li><a class="nav-link" href="community.html">Community Highlights</a></li>
-          <li><a class="nav-link" href="explore.html">Explore by Topic</a></li>
+          <li><a class="nav-link" href="index.html#home" data-i18n="nav.home">Home</a></li>
+          <li><a class="nav-link" href="github.html" data-i18n="nav.dashboard">GitHub Dashboard</a></li>
+          <li><a class="nav-link" href="analytics.html" data-i18n="nav.analytics">Analytics</a></li>
+          <li><a class="nav-link" href="watchlist.html" data-i18n="nav.watchlist">Watchlist</a></li>
+          <li><a class="nav-link" href="achievements.html" data-i18n="nav.achievements">Achievements</a></li>
+          <li><a class="nav-link" href="community.html" data-i18n="nav.community">Community Highlights</a></li>
+          <li><a class="nav-link" href="explore.html" data-i18n="nav.explore">Explore by Topic</a></li>
           <li>
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
               <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -51,7 +52,8 @@
     <main>
       <section class="github-section">
         <div class="container">
-          <h2 class="section-title" style="font-family:'Eightgon',sans-serif;">Your Open Source Contributions</h2>
+          <h2 class="section-title" style="font-family:'Eightgon',sans-serif;" data-i18n="nav.contributions">Your Open
+            Source Contributions</h2>
 
           <!-- Profile Avatar (Fallback) -->
           <div class="profile-header" style="margin:15px 0; display:flex; align-items:center; gap:12px;">
@@ -117,11 +119,11 @@
               <div class="footer-content">
                 <div class="footer-brand">
                   <span class="logo-text">XAYTHEON</span>
-                  <p>Empowering the next generation of innovators</p>
+                  <p data-i18n="footer.tagline">Empowering the next generation of innovators</p>
                 </div>
               </div>
               <div class="footer-bottom">
-                <p>&copy; 2026 XAYTHEON. All rights reserved.</p>
+                <p data-i18n="footer.copyright">&copy; 2026 XAYTHEON. All rights reserved.</p>
               </div>
             </div>
           </footer>

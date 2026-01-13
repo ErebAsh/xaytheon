@@ -27,7 +27,7 @@ exports.findByEmail = (email) =>
     }
 
     db.get(
-      "SELECT id, email, password, view_history FROM users WHERE email = ?",
+      "SELECT id, email, password, view_history, preferred_language FROM users WHERE email = ?",
       [email],
       (err, row) => {
         if (err) reject(err);
@@ -48,7 +48,7 @@ exports.findById = (id) =>
     }
 
     db.get(
-      "SELECT id, email, view_history, refresh_token FROM users WHERE id = ?",
+      "SELECT id, email, view_history, refresh_token, preferred_language FROM users WHERE id = ?",
       [userId],
       (err, row) => {
         if (err) reject(err);
@@ -195,6 +195,30 @@ exports.clearResetToken = (userId) =>
            updated_at = CURRENT_TIMESTAMP 
        WHERE id = ?`,
       [id],
+      function (err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      }
+    );
+  });
+
+exports.updatePreferredLanguage = (userId, lang) =>
+  new Promise((resolve, reject) => {
+    if (!userId || (typeof userId !== 'number' && typeof userId !== 'string')) {
+      return reject(new Error('Invalid user ID'));
+    }
+    if (!lang || typeof lang !== 'string' || lang.length > 10) {
+      return reject(new Error('Invalid language code'));
+    }
+
+    const id = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    if (isNaN(id) || id <= 0) {
+      return reject(new Error('Invalid user ID'));
+    }
+
+    db.run(
+      "UPDATE users SET preferred_language = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      [lang, id],
       function (err) {
         if (err) reject(err);
         else resolve(this.changes);

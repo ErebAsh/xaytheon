@@ -1,0 +1,193 @@
+{
+    "meta": {
+        "code": "en",
+        "name": "English",
+        "nativeName": "English",
+        "dir": "ltr"
+    },
+    "nav": {
+        "home": "Home",
+        "dashboard": "GitHub Dashboard",
+        "analytics": "Analytics",
+        "watchlist": "Watchlist",
+        "achievements": "Achievements",
+        "community": "Community Highlights",
+        "explore": "Explore by Topic",
+        "contributions": "Contributions",
+        "login": "Login",
+        "signup": "Sign Up",
+        "logout": "Logout",
+        "profile": "Profile"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success!",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search",
+        "filter": "Filter",
+        "sortBy": "Sort by",
+        "viewAll": "View All",
+        "learnMore": "Learn More",
+        "getStarted": "Get Started",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "noResults": "No results found",
+        "tryAgain": "Try Again"
+    },
+    "home": {
+        "hero": {
+            "title": "Welcome to XAYTHEON",
+            "subtitle": "Track your GitHub growth, earn achievements, and collaborate with the developer community",
+            "cta": "Get Started"
+        },
+        "features": {
+            "title": "Features",
+            "analytics": {
+                "title": "GitHub Analytics",
+                "description": "Track your stars, commits, and repository growth over time"
+            },
+            "achievements": {
+                "title": "Achievements & Badges",
+                "description": "Earn XP and unlock badges based on your GitHub activity"
+            },
+            "community": {
+                "title": "Community",
+                "description": "Connect with developers and share your achievements"
+            }
+        },
+        "recommendationsTitle": "Recommended for You",
+        "recommendationsSubtitle": "Based on your viewing history",
+        "emptyRecState": "Start exploring repositories to get personalized recommendations!"
+    },
+    "dashboard": {
+        "title": "GitHub Dashboard",
+        "subtitle": "Your GitHub Statistics at a Glance",
+        "stats": {
+            "repositories": "Repositories",
+            "stars": "Total Stars",
+            "followers": "Followers",
+            "following": "Following",
+            "commits": "Commits",
+            "contributions": "Contributions"
+        },
+        "enterUsername": "Enter GitHub Username",
+        "fetchData": "Fetch Data",
+        "recentActivity": "Recent Activity",
+        "topRepositories": "Top Repositories"
+    },
+    "achievements": {
+        "title": "Achievements & Leaderboard",
+        "subtitle": "Earn badges, collect XP, and compete with the community",
+        "tabs": {
+            "badges": "Badges",
+            "leaderboard": "Leaderboard",
+            "activity": "XP Activity"
+        },
+        "categories": {
+            "all": "All",
+            "stars": "Stars",
+            "repos": "Repos",
+            "social": "Social",
+            "commits": "Commits",
+            "streak": "Streak",
+            "special": "Special"
+        },
+        "stats": {
+            "unlocked": "Unlocked",
+            "total": "Total",
+            "rank": "Rank",
+            "level": "Level",
+            "xp": "XP",
+            "streak": "day streak"
+        },
+        "unlocked": "Achievement Unlocked!",
+        "locked": "Locked"
+    },
+    "analytics": {
+        "title": "Analytics Dashboard",
+        "subtitle": "Deep insights into your GitHub journey",
+        "growth": "Growth Over Time",
+        "comparison": "Repository Comparison",
+        "activity": "Activity Heatmap",
+        "languages": "Language Distribution"
+    },
+    "watchlist": {
+        "title": "Watchlist",
+        "subtitle": "Track your favorite repositories",
+        "addRepo": "Add Repository",
+        "removeRepo": "Remove",
+        "lastUpdated": "Last Updated",
+        "noRepos": "No repositories in your watchlist yet"
+    },
+    "community": {
+        "title": "Community Highlights",
+        "subtitle": "Featured projects and top contributors",
+        "trending": "Trending Repositories",
+        "topContributors": "Top Contributors",
+        "featured": "Featured Projects"
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome Back",
+            "subtitle": "Sign in to your account",
+            "email": "Email address",
+            "password": "Password",
+            "rememberMe": "Remember me",
+            "forgotPassword": "Forgot password?",
+            "submit": "Sign In",
+            "noAccount": "Don't have an account?",
+            "signUp": "Sign up"
+        },
+        "signup": {
+            "title": "Create Account",
+            "subtitle": "Join the XAYTHEON community",
+            "username": "Username",
+            "email": "Email address",
+            "password": "Password",
+            "confirmPassword": "Confirm password",
+            "submit": "Create Account",
+            "hasAccount": "Already have an account?",
+            "signIn": "Sign in"
+        }
+    },
+    "footer": {
+        "tagline": "Empowering the next generation of innovators",
+        "copyright": "© 2026 XAYTHEON. All rights reserved.",
+        "links": {
+            "about": "About",
+            "privacy": "Privacy",
+            "terms": "Terms",
+            "contact": "Contact"
+        }
+    },
+    "errors": {
+        "notFound": "Page not found",
+        "serverError": "Server error",
+        "unauthorized": "Unauthorized access",
+        "networkError": "Network error. Please check your connection."
+    },
+    "offline": {
+        "title": "You're Offline",
+        "message": "It looks like you've lost your internet connection.",
+        "retry": "Try Again",
+        "cachedPages": "Available Offline"
+    },
+    "language": {
+        "select": "Select Language",
+        "current": "English"
+    },
+    "dates": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "{count} days ago",
+        "monthsAgo": "{count} months ago",
+        "yearsAgo": "{count} years ago"
+    }
+}

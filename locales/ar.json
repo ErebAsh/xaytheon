@@ -1,0 +1,193 @@
+{
+    "meta": {
+        "code": "ar",
+        "name": "Arabic",
+        "nativeName": "العربية",
+        "dir": "rtl"
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "dashboard": "لوحة بيانات GitHub",
+        "analytics": "التحليلات",
+        "watchlist": "قائمة المراقبة",
+        "achievements": "الإنجازات",
+        "community": "أبرز أحداث المجتمع",
+        "explore": "استكشف حسب الموضوع",
+        "contributions": "المساهمات",
+        "login": "تسجيل الدخول",
+        "signup": "إنشاء حساب",
+        "logout": "تسجيل الخروج",
+        "profile": "الملف الشخصي"
+    },
+    "common": {
+        "loading": "جاري التحميل...",
+        "error": "حدث خطأ ما",
+        "success": "تم بنجاح!",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "search": "بحث",
+        "filter": "تصفية",
+        "sortBy": "فرز حسب",
+        "viewAll": "عرض الكل",
+        "learnMore": "تعلم المزيد",
+        "getStarted": "ابدأ الآن",
+        "close": "إغلاق",
+        "back": "رجوع",
+        "next": "التالي",
+        "previous": "السابق",
+        "submit": "إرسال",
+        "noResults": "لم يتم العثور على نتائج",
+        "tryAgain": "حاول مرة أخرى"
+    },
+    "home": {
+        "hero": {
+            "title": "مرحباً بكم في XAYTHEON",
+            "subtitle": "تتبع نموك على GitHub، واحصل على الإنجازات، وتعاون مع مجتمع المطورين",
+            "cta": "ابدأ الآن"
+        },
+        "features": {
+            "title": "المميزات",
+            "analytics": {
+                "title": "تحليلات GitHub",
+                "description": "تتبع نجومك ومساهماتك ونمو مستودعاتك بمرور الوقت"
+            },
+            "achievements": {
+                "title": "الإنجازات والشارات",
+                "description": "اكسب نقاط الخبرة وافتح الشارات بناءً على نشاطك في GitHub"
+            },
+            "community": {
+                "title": "المجتمع",
+                "description": "تواصل مع المطورين وشارك إنجازاتك"
+            }
+        },
+        "recommendationsTitle": "موصى به لك",
+        "recommendationsSubtitle": "بناءً على سجل المشاهدة الخاص بك",
+        "emptyRecState": "ابدأ في استكشاف المستودعات للحصول على توصيات مخصصة!"
+    },
+    "dashboard": {
+        "title": "لوحة بيانات GitHub",
+        "subtitle": "إحصائيات GitHub الخاصة بك في لمح البصر",
+        "stats": {
+            "repositories": "المستودعات",
+            "stars": "إجمالي النجوم",
+            "followers": "المتابعون",
+            "following": "المتابَعون",
+            "commits": "المساهمات",
+            "contributions": "المشاركات"
+        },
+        "enterUsername": "أدخل اسم مستخدم GitHub",
+        "fetchData": "جلب البيانات",
+        "recentActivity": "النشاط الأخير",
+        "topRepositories": "أفضل المستودعات"
+    },
+    "achievements": {
+        "title": "الإنجازات ولوحة المتصدرين",
+        "subtitle": "اكسب الشارات، واجمع نقاط الخبرة، ونافس المجتمع",
+        "tabs": {
+            "badges": "الشارات",
+            "leaderboard": "لوحة المتصدرين",
+            "activity": "نشاط نقاط الخبرة"
+        },
+        "categories": {
+            "all": "الكل",
+            "stars": "النجوم",
+            "repos": "المستودعات",
+            "social": "اجتماعي",
+            "commits": "المساهمات",
+            "streak": "سلسلة",
+            "special": "خاص"
+        },
+        "stats": {
+            "unlocked": "مفتوح",
+            "total": "الإجمالي",
+            "rank": "الرتبة",
+            "level": "المستوى",
+            "xp": "نقاط الخبرة",
+            "streak": "سلسلة أيام"
+        },
+        "unlocked": "تم فتح الإنجاز!",
+        "locked": "مغلق"
+    },
+    "analytics": {
+        "title": "لوحة تحليلات",
+        "subtitle": "رؤى عميقة في رحلتك على GitHub",
+        "growth": "النمو بمرور الوقت",
+        "comparison": "مقارنة المستودعات",
+        "activity": "خريطة النشاط الحرارية",
+        "languages": "توزيع اللغات"
+    },
+    "watchlist": {
+        "title": "قائمة المراقبة",
+        "subtitle": "تتبع مستودعاتك المفضلة",
+        "addRepo": "إضافة مستودع",
+        "removeRepo": "إزالة",
+        "lastUpdated": "آخر تحديث",
+        "noRepos": "لا توجد مستودعات في قائمة المراقبة الخاصة بك حتى الآن"
+    },
+    "community": {
+        "title": "أبرز أحداث المجتمع",
+        "subtitle": "المشاريع المميزة وأفضل المساهمين",
+        "trending": "المستودعات الشائعة",
+        "topContributors": "أفضل المساهمين",
+        "featured": "المشاريع المميزة"
+    },
+    "auth": {
+        "login": {
+            "title": "مرحباً بعودتك",
+            "subtitle": "سجل الدخول إلى حسابك",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "rememberMe": "تذكرني",
+            "forgotPassword": "هل نسيت كلمة المرور؟",
+            "submit": "تسجيل الدخول",
+            "noAccount": "ليس لديك حساب؟",
+            "signUp": "إنشاء حساب"
+        },
+        "signup": {
+            "title": "إنشاء حساب",
+            "subtitle": "انضم إلى مجتمع XAYTHEON",
+            "username": "اسم المستخدم",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "confirmPassword": "تأكيد كلمة المرور",
+            "submit": "إنشاء حساب",
+            "hasAccount": "لديك حساب بالفعل؟",
+            "signIn": "تسجيل الدخول"
+        }
+    },
+    "footer": {
+        "tagline": "تمكين الجيل القادم من المبتكرين",
+        "copyright": "© 2026 XAYTHEON. جميع الحقوق محفوظة.",
+        "links": {
+            "about": "حول",
+            "privacy": "الخصوصية",
+            "terms": "الشروط",
+            "contact": "اتصل بنا"
+        }
+    },
+    "errors": {
+        "notFound": "الصفحة غير موجودة",
+        "serverError": "خطأ في الخادم",
+        "unauthorized": "وصول غير مصرح به",
+        "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك."
+    },
+    "offline": {
+        "title": "أنت غير متصل",
+        "message": "يبدو أنك فقدت الاتصال بالإنترنت.",
+        "retry": "حاول مرة أخرى",
+        "cachedPages": "متاح بدون اتصال"
+    },
+    "language": {
+        "select": "اختر اللغة",
+        "current": "العربية"
+    },
+    "dates": {
+        "today": "اليوم",
+        "yesterday": "أمس",
+        "daysAgo": "منذ {count} أيام",
+        "monthsAgo": "منذ {count} أشهر",
+        "yearsAgo": "منذ {count} سنوات"
+    }
+}

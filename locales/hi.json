@@ -1,0 +1,190 @@
+{
+    "meta": {
+        "code": "hi",
+        "name": "Hindi",
+        "nativeName": "हिंदी",
+        "dir": "ltr"
+    },
+    "nav": {
+        "home": "होम",
+        "dashboard": "गिटहब डैशबोर्ड",
+        "analytics": "एनालिटिक्स",
+        "watchlist": "वॉचलिस्ट",
+        "achievements": "उपलब्धियाँ",
+        "community": "समुदाय हाइलाइट्स",
+        "explore": "विषय के अनुसार खोजें",
+        "contributions": "योगदान",
+        "login": "लॉगिन",
+        "signup": "साइन अप",
+        "logout": "लॉगआउट",
+        "profile": "प्रोफ़ाइल"
+    },
+    "common": {
+        "loading": "लोड हो रहा है...",
+        "error": "एक त्रुटि हुई",
+        "success": "सफलता!",
+        "save": "सहेजें",
+        "cancel": "रद्द करें",
+        "delete": "हटाएं",
+        "edit": "संपादित करें",
+        "search": "खोजें",
+        "filter": "फ़िल्टर",
+        "sortBy": "इसके अनुसार क्रमबद्ध करें",
+        "viewAll": "सभी देखें",
+        "learnMore": "और जानें",
+        "getStarted": "शुरू करें",
+        "close": "बंद करें",
+        "back": "पीछे",
+        "next": "अगला",
+        "previous": "पिछला",
+        "submit": "जमा करें",
+        "noResults": "कोई परिणाम नहीं मिला",
+        "tryAgain": "पुनः प्रयास करें"
+    },
+    "home": {
+        "hero": {
+            "title": "XAYTHEON में आपका स्वागत है",
+            "subtitle": "अपनी गिटहब वृद्धि को ट्रैक करें, उपलब्धियाँ अर्जित करें और डेवलपर समुदाय के साथ सहयोग करें",
+            "cta": "शुरू करें"
+        },
+        "features": {
+            "title": "विशेषताएं",
+            "analytics": {
+                "title": "गिटहब एनालिटिक्स",
+                "description": "समय के साथ अपने स्टार्स, कमिट्स और रिपॉजिटरी वृद्धि को ट्रैक करें"
+            },
+            "achievements": {
+                "title": "उपलब्धियाँ और बैज",
+                "description": "अपनी गिटहब गतिविधि के आधार पर XP अर्जित करें और बैज अनलॉक करें"
+            },
+            "community": {
+                "title": "समुदाय",
+                "description": "डेवलपर्स से जुड़ें और अपनी उपलब्धियाँ साझा करें"
+            }
+        }
+    },
+    "dashboard": {
+        "title": "गिटहब डैशबोर्ड",
+        "subtitle": "एक नज़र में आपके गिटहब आंकड़े",
+        "stats": {
+            "repositories": "रिपॉजिटरी",
+            "stars": "कुल स्टार्स",
+            "followers": "फॉलोअर्स",
+            "following": "फॉलोइंग",
+            "commits": "कमिट्स",
+            "contributions": "योगदान"
+        },
+        "enterUsername": "गिटहब यूज़रनेम दर्ज करें",
+        "fetchData": "डेटा प्राप्त करें",
+        "recentActivity": "हाल की गतिविधि",
+        "topRepositories": "शीर्ष रिपॉजिटरी"
+    },
+    "achievements": {
+        "title": "उपलब्धियाँ और लीडरबोर्ड",
+        "subtitle": "बैज अर्जित करें, XP इकट्ठा करें और समुदाय के साथ प्रतिस्पर्धा करें",
+        "tabs": {
+            "badges": "बैज",
+            "leaderboard": "लीडरबोर्ड",
+            "activity": "XP गतिविधि"
+        },
+        "categories": {
+            "all": "सभी",
+            "stars": "स्टार्स",
+            "repos": "रिपॉज़",
+            "social": "सोशल",
+            "commits": "कमिट्स",
+            "streak": "स्ट्रीक",
+            "special": "विशेष"
+        },
+        "stats": {
+            "unlocked": "अनलॉक",
+            "total": "कुल",
+            "rank": "रैंक",
+            "level": "स्तर",
+            "xp": "XP",
+            "streak": "दिन की स्ट्रीक"
+        },
+        "unlocked": "उपलब्धि अनलॉक!",
+        "locked": "लॉक"
+    },
+    "analytics": {
+        "title": "एनालिटिक्स डैशबोर्ड",
+        "subtitle": "आपकी गिटहब यात्रा में गहन अंतर्दृष्टि",
+        "growth": "समय के साथ वृद्धि",
+        "comparison": "रिपॉजिटरी तुलना",
+        "activity": "गतिविधि हीटमैप",
+        "languages": "भाषा वितरण"
+    },
+    "watchlist": {
+        "title": "वॉचलिस्ट",
+        "subtitle": "अपनी पसंदीदा रिपॉजिटरी को ट्रैक करें",
+        "addRepo": "रिपॉजिटरी जोड़ें",
+        "removeRepo": "हटाएं",
+        "lastUpdated": "अंतिम अपडेट",
+        "noRepos": "आपकी वॉचलिस्ट में अभी कोई रिपॉजिटरी नहीं है"
+    },
+    "community": {
+        "title": "समुदाय हाइलाइट्स",
+        "subtitle": "फीचर्ड प्रोजेक्ट्स और शीर्ष योगदानकर्ता",
+        "trending": "ट्रेंडिंग रिपॉजिटरी",
+        "topContributors": "शीर्ष योगदानकर्ता",
+        "featured": "फीचर्ड प्रोजेक्ट्स"
+    },
+    "auth": {
+        "login": {
+            "title": "वापस स्वागत है",
+            "subtitle": "अपने खाते में साइन इन करें",
+            "email": "ईमेल पता",
+            "password": "पासवर्ड",
+            "rememberMe": "मुझे याद रखें",
+            "forgotPassword": "पासवर्ड भूल गए?",
+            "submit": "साइन इन करें",
+            "noAccount": "खाता नहीं है?",
+            "signUp": "साइन अप करें"
+        },
+        "signup": {
+            "title": "खाता बनाएं",
+            "subtitle": "XAYTHEON समुदाय में शामिल हों",
+            "username": "यूज़रनेम",
+            "email": "ईमेल पता",
+            "password": "पासवर्ड",
+            "confirmPassword": "पासवर्ड की पुष्टि करें",
+            "submit": "खाता बनाएं",
+            "hasAccount": "पहले से खाता है?",
+            "signIn": "साइन इन करें"
+        }
+    },
+    "footer": {
+        "tagline": "नवप्रवर्तकों की अगली पीढ़ी को सशक्त बनाना",
+        "copyright": "© 2026 XAYTHEON. सर्वाधिकार सुरक्षित।",
+        "links": {
+            "about": "बारे में",
+            "privacy": "गोपनीयता",
+            "terms": "शर्तें",
+            "contact": "संपर्क"
+        }
+    },
+    "errors": {
+        "notFound": "पेज नहीं मिला",
+        "serverError": "सर्वर त्रुटि",
+        "unauthorized": "अनधिकृत पहुंच",
+        "networkError": "नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें।"
+    },
+    "offline": {
+        "title": "आप ऑफ़लाइन हैं",
+        "message": "ऐसा लगता है कि आपने अपना इंटरनेट कनेक्शन खो दिया है।",
+        "retry": "पुनः प्रयास करें",
+        "cachedPages": "ऑफ़लाइन उपलब्ध"
+    },
+    "language": {
+        "select": "भाषा चुनें",
+        "current": "हिंदी"
+    },
+    "dates": {
+        "today": "आज",
+        "yesterday": "कल",
+        "daysAgo": "{count} दिन पहले",
+        "monthsAgo": "{count} महीने पहले",
+        "yearsAgo": "{count} साल पहले"
+    }
+}

@@ -1,0 +1,190 @@
+{
+    "meta": {
+        "code": "fr",
+        "name": "French",
+        "nativeName": "Français",
+        "dir": "ltr"
+    },
+    "nav": {
+        "home": "Accueil",
+        "dashboard": "Tableau de bord GitHub",
+        "analytics": "Analytiques",
+        "watchlist": "Liste de suivi",
+        "achievements": "Réalisations",
+        "community": "Points forts de la communauté",
+        "explore": "Explorer par sujet",
+        "contributions": "Contributions",
+        "login": "Connexion",
+        "signup": "S'inscrire",
+        "logout": "Déconnexion",
+        "profile": "Profil"
+    },
+    "common": {
+        "loading": "Chargement...",
+        "error": "Une erreur s'est produite",
+        "success": "Succès !",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "search": "Rechercher",
+        "filter": "Filtrer",
+        "sortBy": "Trier par",
+        "viewAll": "Voir tout",
+        "learnMore": "En savoir plus",
+        "getStarted": "Commencer",
+        "close": "Fermer",
+        "back": "Retour",
+        "next": "Suivant",
+        "previous": "Précédent",
+        "submit": "Soumettre",
+        "noResults": "Aucun résultat trouvé",
+        "tryAgain": "Réessayer"
+    },
+    "home": {
+        "hero": {
+            "title": "Bienvenue sur XAYTHEON",
+            "subtitle": "Suivez votre croissance GitHub, gagnez des réalisations et collaborez avec la communauté des développeurs",
+            "cta": "Commencer"
+        },
+        "features": {
+            "title": "Fonctionnalités",
+            "analytics": {
+                "title": "Analytiques GitHub",
+                "description": "Suivez vos étoiles, commits et la croissance de vos dépôts au fil du temps"
+            },
+            "achievements": {
+                "title": "Réalisations et badges",
+                "description": "Gagnez des XP et débloquez des badges basés sur votre activité GitHub"
+            },
+            "community": {
+                "title": "Communauté",
+                "description": "Connectez-vous avec des développeurs et partagez vos réalisations"
+            }
+        }
+    },
+    "dashboard": {
+        "title": "Tableau de bord GitHub",
+        "subtitle": "Vos statistiques GitHub en un coup d'œil",
+        "stats": {
+            "repositories": "Dépôts",
+            "stars": "Étoiles totales",
+            "followers": "Abonnés",
+            "following": "Abonnements",
+            "commits": "Commits",
+            "contributions": "Contributions"
+        },
+        "enterUsername": "Entrez le nom d'utilisateur GitHub",
+        "fetchData": "Récupérer les données",
+        "recentActivity": "Activité récente",
+        "topRepositories": "Meilleurs dépôts"
+    },
+    "achievements": {
+        "title": "Réalisations et classement",
+        "subtitle": "Gagnez des badges, accumulez des XP et rivalisez avec la communauté",
+        "tabs": {
+            "badges": "Badges",
+            "leaderboard": "Classement",
+            "activity": "Activité XP"
+        },
+        "categories": {
+            "all": "Tout",
+            "stars": "Étoiles",
+            "repos": "Dépôts",
+            "social": "Social",
+            "commits": "Commits",
+            "streak": "Série",
+            "special": "Spécial"
+        },
+        "stats": {
+            "unlocked": "Débloqué",
+            "total": "Total",
+            "rank": "Rang",
+            "level": "Niveau",
+            "xp": "XP",
+            "streak": "jours de série"
+        },
+        "unlocked": "Réalisation débloquée !",
+        "locked": "Verrouillé"
+    },
+    "analytics": {
+        "title": "Tableau de bord analytique",
+        "subtitle": "Aperçus approfondis de votre parcours GitHub",
+        "growth": "Croissance au fil du temps",
+        "comparison": "Comparaison des dépôts",
+        "activity": "Carte thermique d'activité",
+        "languages": "Distribution des langages"
+    },
+    "watchlist": {
+        "title": "Liste de suivi",
+        "subtitle": "Suivez vos dépôts favoris",
+        "addRepo": "Ajouter un dépôt",
+        "removeRepo": "Supprimer",
+        "lastUpdated": "Dernière mise à jour",
+        "noRepos": "Aucun dépôt dans votre liste de suivi pour l'instant"
+    },
+    "community": {
+        "title": "Points forts de la communauté",
+        "subtitle": "Projets en vedette et meilleurs contributeurs",
+        "trending": "Dépôts tendance",
+        "topContributors": "Meilleurs contributeurs",
+        "featured": "Projets en vedette"
+    },
+    "auth": {
+        "login": {
+            "title": "Bon retour",
+            "subtitle": "Connectez-vous à votre compte",
+            "email": "Adresse e-mail",
+            "password": "Mot de passe",
+            "rememberMe": "Se souvenir de moi",
+            "forgotPassword": "Mot de passe oublié ?",
+            "submit": "Se connecter",
+            "noAccount": "Pas de compte ?",
+            "signUp": "S'inscrire"
+        },
+        "signup": {
+            "title": "Créer un compte",
+            "subtitle": "Rejoignez la communauté XAYTHEON",
+            "username": "Nom d'utilisateur",
+            "email": "Adresse e-mail",
+            "password": "Mot de passe",
+            "confirmPassword": "Confirmer le mot de passe",
+            "submit": "Créer un compte",
+            "hasAccount": "Déjà un compte ?",
+            "signIn": "Se connecter"
+        }
+    },
+    "footer": {
+        "tagline": "Donner du pouvoir à la prochaine génération d'innovateurs",
+        "copyright": "© 2026 XAYTHEON. Tous droits réservés.",
+        "links": {
+            "about": "À propos",
+            "privacy": "Confidentialité",
+            "terms": "Conditions",
+            "contact": "Contact"
+        }
+    },
+    "errors": {
+        "notFound": "Page non trouvée",
+        "serverError": "Erreur du serveur",
+        "unauthorized": "Accès non autorisé",
+        "networkError": "Erreur réseau. Veuillez vérifier votre connexion."
+    },
+    "offline": {
+        "title": "Vous êtes hors ligne",
+        "message": "Il semble que vous ayez perdu votre connexion Internet.",
+        "retry": "Réessayer",
+        "cachedPages": "Disponible hors ligne"
+    },
+    "language": {
+        "select": "Sélectionner la langue",
+        "current": "Français"
+    },
+    "dates": {
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "daysAgo": "il y a {count} jours",
+        "monthsAgo": "il y a {count} mois",
+        "yearsAgo": "il y a {count} ans"
+    }
+}
