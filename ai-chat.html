@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Assistant — XAYTHEON</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ai.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.44.4/dist/umd/supabase.min.js"></script>
+    <script defer src="auth.js"></script>
+</head>
+
+<body class="eightgon-page">
+    <div class="page-wrapper">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a class="logo" href="index.html">
+                    <img class="logo-img" src="assets/logo/thelogo.png" alt="XAYTHEON logo">
+                </a>
+                <ul class="nav-menu">
+                    <li><a class="nav-link" href="index.html#home">Home</a></li>
+                    <li><a class="nav-link" href="github.html">Dashboard</a></li>
+                    <li><a class="nav-link active" href="ai-chat.html">AI Assistant</a></li>
+                    <li><a class="nav-link" href="dependency-graph.html">Dep Graph</a></li>
+                    <li><a class="nav-link" href="workflow-builder.html">Workflow</a></li>
+                    <li><a class="nav-link" href="sentiment.html">Sentiment</a></li>
+                    <li id="auth-area"></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="ai-container">
+            <div class="chat-layout">
+                <!-- Sidebar: Repo Context & Summary -->
+                <aside class="ai-sidebar">
+                    <div class="card summary-card">
+                        <h3>Repository Summary</h3>
+                        <div id="repo-summary" class="summary-text">
+                            Select a repository to generate an AI summary.
+                        </div>
+                        <button id="summarize-btn" class="btn btn-outline btn-sm">
+                            <i class="ri-magic-line"></i> Explain Repo
+                        </button>
+                    </div>
+
+                    <div class="card suggestions-card">
+                        <h3>Quick Questions</h3>
+                        <ul class="suggestion-list">
+                            <li><button class="suggest-btn">How do I run this locally?</button></li>
+                            <li><button class="suggest-btn">Explain the folder structure.</button></li>
+                            <li><button class="suggest-btn">Find potential security risks.</button></li>
+                            <li><button class="suggest-btn">How to contribute?</button></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Chat Area -->
+                <section class="chat-area">
+                    <div class="chat-header">
+                        <div class="ai-status">
+                            <div class="pulse-dot"></div>
+                            <span>AI Assistant Online</span>
+                        </div>
+                        <button id="clear-chat" class="icon-btn" title="Clear Chat History">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Bot Message -->
+                        <div class="msg bot-msg">
+                            <div class="msg-content">
+                                Hello! I'm the XAYTHEON AI. I can help you analyze repositories, review code, or explain
+                                complex project structures. What would you like to know?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-wrapper">
+                        <div class="input-container">
+                            <textarea id="user-input" placeholder="Ask anything about the codebase..."
+                                rows="1"></textarea>
+                            <button id="send-btn" class="send-btn">
+                                <i class="ri-send-plane-2-fill"></i>
+                            </button>
+                        </div>
+                        <p class="input-footer">AI can make mistakes. Verify important code suggestions.</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="ai.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
