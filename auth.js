@@ -1,14 +1,10 @@
-// Ensure global namespace exists immediately
-window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
-
 (function () {
   // Define API URL once
   const API_BASE_URL = "http://127.0.0.1:5000/api/auth";
 
   const REQUEST_TIMEOUT = 30000;
 
-  async function fetchWithTimeout(resource, options = {}) {
-    const { timeout = REQUEST_TIMEOUT } = options;
+  async function fetchWithTimeout(url, options = {}, timeout = REQUEST_TIMEOUT) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     try {
@@ -51,8 +47,8 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
 
   function getSession() {
     return {
-      user: currentUser,
-      accessToken: accessToken,
+      access_token: accessToken,
+      user: currentUser
     };
   }
 
@@ -60,8 +56,7 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
     accessToken = null;
     currentUser = null;
     tokenExpiryTime = null;
-    localStorage.removeItem("x_refresh_token");
-
+    localStorage.removeItem("x_refresh_token"); // Clear persistence
     if (refreshTimer) {
       clearTimeout(refreshTimer);
       refreshTimer = null;
@@ -83,6 +78,7 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
   async function refreshAccessToken() {
     try {
       const storedRefreshToken = localStorage.getItem("x_refresh_token");
+      const isFileProtocol = window.location.protocol === 'file:';
 
       let options = {
         method: "POST",
@@ -91,13 +87,18 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
 
       if (storedRefreshToken) {
         options.body = JSON.stringify({ refreshToken: storedRefreshToken });
+        // On file protocol, avoiding credentials helps avoid some CORS/cookie strictness
+        // On http/https, we can include them, but it's not strictly necessary if body has token
       } else {
         options.credentials = "include"; // Try cookie
       }
 
       const res = await fetchWithTimeout(`${API_BASE_URL}/refresh`, options);
 
-      if (!res.ok) throw { code: "SESSION_EXPIRED" };
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.message || "Token refresh failed");
+      }
 
       const data = await res.json();
       setAccessToken(data.accessToken, data.expiresIn, data.user);
@@ -112,7 +113,6 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
       clearAccessToken();
       return false;
     }
-  }
 
   async function authenticatedFetch(url, options = {}) {
     if (isTokenExpired()) {
@@ -123,25 +123,50 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
       }
     }
 
-    const res = await fetchWithTimeout(url, {
+    const response = await fetchWithTimeout(url, {
       ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers,
+      credentials: "include",
     });
 
-    if (res.status === 401) throw { code: "UNAUTHORIZED" };
-    return res;
+    if (response.status === 401) {
+      const data = await response.json();
+      if (data.expired) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          // Retry request with new token
+          headers.Authorization = `Bearer ${getAccessToken()}`;
+          return fetch(url, { ...options, headers, credentials: "include" });
+        }
+      }
+    }
+
+    return response;
+  }
+
+  function isAuthenticated() {
+    return accessToken !== null;
   }
 
   async function login(email, password) {
-    if (!email || !password) throw { code: "INVALID_INPUT" };
+    // Input validation
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
+      throw new Error('Email and password are required');
+    }
+
+    if (email.length > 254 || password.length > 128) {
+      throw new Error('Input data too long');
+    }
+
+    if (email.length < 3 || password.length < 8) {
+      throw new Error('Input data too short');
+    }
 
     try {
       const res = await fetchWithTimeout(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: email.trim(), password }),
       });
 
@@ -157,6 +182,12 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
       }
 
       const data = await res.json();
+
+      // Validate response data
+      if (!data.accessToken || !data.user) {
+        throw new Error('Invalid response from server');
+      }
+
       setAccessToken(data.accessToken, data.expiresIn, data.user);
 
       if (data.refreshToken) {
@@ -167,15 +198,30 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
       await fetchPreferences();
 
     } catch (err) {
-      if (err.message?.includes("Failed to fetch")) {
-        throw { code: "NETWORK_ERROR" };
+      if (err.message.includes('timeout')) {
+        throw new Error('Request timeout. Please check your connection.');
       }
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        throw new Error('Network error. Please check your connection.');
+      }
+      // Re-throw the original error if it's already user-friendly
       throw err;
     }
   }
 
   async function register(email, password) {
-    if (!email || !password) throw { code: "INVALID_INPUT" };
+    // Input validation
+    if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
+      throw new Error('Email and password are required');
+    }
+
+    if (email.length > 254 || password.length > 128) {
+      throw new Error('Input data too long');
+    }
+
+    if (email.length < 3 || password.length < 8) {
+      throw new Error('Input data too short');
+    }
 
     try {
       const res = await fetchWithTimeout(`${API_BASE_URL}/register`, {
@@ -184,25 +230,35 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
         body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      if (!res.ok) {
+     if (!res.ok) {
+        // 1. Handle specific HTTP status codes first
         if (res.status === 409) throw { code: "USER_EXISTS" };
         if (res.status === 429) throw { code: "TOO_MANY_ATTEMPTS" };
         if (res.status >= 500) throw { code: "SERVER_ERROR" };
-        
-        // Try to parse detailed error message
+
+        // 2. If it's not a predefined code, try to parse the server's error message
         let errorMessage = "Registration failed";
         try {
           const err = await res.json();
           errorMessage = err.message || errorMessage;
-        } catch { }
+        } catch {
+          // Fallback to status text (e.g., "Not Found") if JSON parsing fails
+          errorMessage = res.statusText || errorMessage;
+        }
+
         throw new Error(errorMessage);
       }
 
-      return await res.json();
+      const data = await res.json();
+      return data;
     } catch (err) {
-      if (err.message?.includes("Failed to fetch")) {
-        throw { code: "NETWORK_ERROR" };
+      if (err.message.includes('timeout')) {
+        throw new Error('Request timeout. Please check your connection.');
       }
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        throw new Error('Network error. Please check your connection.');
+      }
+      // Re-throw the original error if it's already user-friendly
       throw err;
     }
   }
@@ -244,6 +300,9 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
       await fetchWithTimeout(`${API_BASE_URL}/logout`, { method: "POST" });
     } catch { }
     clearAccessToken();
+    renderAuthArea();
+    applyAuthGating();
+    // Force reload to clear any private state
     window.location.reload();
   }
 
@@ -265,8 +324,6 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
         await fetchPreferences();
       } catch (err) {
         console.log("No existing session restored");
-        lastAuthError = err.message;
-        renderAuthArea();
       }
     }
   }
@@ -338,6 +395,7 @@ window.XAYTHEON_AUTH = window.XAYTHEON_AUTH || {};
   // --- Init ---
 
   window.addEventListener("DOMContentLoaded", async () => {
+    enforceHttps();
     await restoreSession();
     renderAuthArea();
     applyAuthGating();

@@ -916,16 +916,16 @@ const GITHUB_CACHE = {
     );
   },
 
-  get(key) {
+  get(key, ignoreExpiration = false) {
     const raw = localStorage.getItem(this.prefix + key);
     if (!raw) return null;
 
     const entry = JSON.parse(raw);
-    if (Date.now() - entry.timestamp > this.TTL) {
-      localStorage.removeItem(this.prefix + key);
-      return null;
+    if (!ignoreExpiration && Date.now() - entry.timestamp > this.TTL) {
+      // Mark as expired but return date so caller can decide
+      return { data: entry.data, expired: true, timestamp: entry.timestamp };
     }
-    return entry.data;
+    return { data: entry.data, expired: false, timestamp: entry.timestamp };
   },
 
   clear() {
@@ -985,6 +985,11 @@ function clearDashboardUI() {
 
   const contribSvg = document.getElementById("gh-contrib-svg");
   if (contribSvg) contribSvg.innerHTML = '<div class="muted">Load a dashboard to see contributions</div>';
+
+  ["gh-pr-metrics", "gh-languages"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 }
 
 // ---------------- INIT ----------------
@@ -1071,10 +1076,10 @@ async function loadGithubDashboard(username) {
   setDashboardState("loading", "Loading GitHub dashboard…");
 
   const cacheKey = `dashboard:${username}`;
-  const cached = GITHUB_CACHE.get(cacheKey);
+  const cached = GITHUB_CACHE.get(cacheKey, true); // Get even if expired
 
-  if (cached) {
-    renderDashboardData(cached, username);
+  if (cached && !cached.expired) {
+    renderDashboardData(cached.data, username);
     setDashboardState(
       "success",
       "Loaded from cache • refreshing in background ♻️"
@@ -1123,14 +1128,23 @@ async function loadGithubDashboard(username) {
     updateHistoryVisualization(username);
     setDashboardState("success", "Dashboard loaded successfully ✅");
   } catch (e) {
-    setDashboardState(
-      "error",
-      e.message || "Failed to load GitHub data"
-    );
+    // If we have an expired cache, show it as fallback
+    if (cached && cached.expired) {
+      console.warn("API failed, falling back to expired cache", e);
+      renderDashboardData(cached.data, username);
+      setDashboardState("success", "API rate limited. Showing cached data (may be outdated). ⚠️");
+      // No need to throw here, we handled it gracefully
+    } else {
+      setDashboardState(
+        "error",
+        e.message || "Failed to load GitHub data"
+      );
+    }
   } finally {
     requestInFlight = false;
   }
 }
+
 
 async function fetchAndCacheDashboard(username) {
   try {
@@ -1405,6 +1419,102 @@ function renderDashboardData(data, username) {
 
   // Update history visualization
   updateHistoryVisualization(username);
+
+  // Render language stats
+  renderLanguageStats(data.repos);
+
+  // Render PR metrics
+  renderPrMetrics(data.events);
+}
+
+function renderLanguageStats(repos) {
+  const container = document.getElementById("gh-languages");
+  const list = document.getElementById("gh-language-list");
+
+  if (!container || !list) return;
+
+  if (!repos || repos.length === 0) {
+    container.style.display = "none";
+    return;
+  }
+
+  const counts = {};
+  let total = 0;
+
+  repos.forEach(repo => {
+    if (repo.language) {
+      counts[repo.language] = (counts[repo.language] || 0) + 1;
+      total++;
+    }
+  });
+
+  if (total === 0) {
+    container.style.display = "none";
+    return;
+  }
+
+  // Sort by count desc
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  list.innerHTML = sorted.map(([lang, count]) => {
+    const pct = Math.round((count / total) * 100);
+    return `
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem;">
+                <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                    <span style="min-width: 80px;">${lang}</span>
+                    <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="width: ${pct}%; height: 100%; background: #6366f1; border-radius: 3px;"></div>
+                    </div>
+                    <span style="font-size: 0.8rem; opacity: 0.7; min-width: 30px; text-align: right;">${pct}%</span>
+                </div>
+            </div>
+        `;
+  }).join('');
+
+  container.style.display = "block";
+}
+
+function renderPrMetrics(events) {
+  const container = document.getElementById("gh-pr-metrics");
+  const openedEl = document.getElementById("pr-opened");
+  const mergedEl = document.getElementById("pr-merged");
+  const closedEl = document.getElementById("pr-closed");
+
+  if (!container || !openedEl || !mergedEl || !closedEl) return;
+
+  let opened = 0;
+  let merged = 0;
+  let closed = 0;
+
+  if (events && events.length > 0) {
+    events.forEach(ev => {
+      if (ev.type === "PullRequestEvent") {
+        const action = ev.payload.action;
+        const pr = ev.payload.pull_request;
+
+        if (action === "opened") {
+          opened++;
+        } else if (action === "closed") {
+          if (pr && pr.merged) {
+            merged++;
+          } else {
+            closed++;
+          }
+        }
+      }
+    });
+  }
+
+  // Only show if there is some activity
+  if (opened === 0 && merged === 0 && closed === 0) {
+    container.style.display = "none";
+    return;
+  }
+
+  openedEl.textContent = opened;
+  mergedEl.textContent = merged;
+  closedEl.textContent = closed;
+  container.style.display = "block";
 }
 
 async function ghJson(url, headers = {}) {
@@ -1416,12 +1526,20 @@ async function ghJson(url, headers = {}) {
     },
   });
 
+  // Extract Rate Limit Headers
+  const limit = res.headers.get("X-RateLimit-Limit");
+  const remaining = res.headers.get("X-RateLimit-Remaining");
+
+  if (limit && remaining) {
+    updateRateLimitUI(remaining, limit);
+  }
+
   // Check for rate limiting
   if (res.status === 403 || res.status === 429) {
     const resetTime = res.headers.get('X-RateLimit-Reset');
-    const remaining = res.headers.get('X-RateLimit-Remaining');
+    const remainingVal = res.headers.get('X-RateLimit-Remaining');
 
-    if (remaining === '0' || res.status === 429) {
+    if (remainingVal === '0' || res.status === 429) {
       const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000) : null;
       const waitTime = resetDate ? Math.ceil((resetDate - Date.now()) / 60000) : 'unknown';
       throw new Error(`⚠️ GitHub API rate limit exceeded. Please try again in ${waitTime} minutes.`);
@@ -1433,6 +1551,26 @@ async function ghJson(url, headers = {}) {
     throw new Error(`GitHub API ${res.status}: ${text}`);
   }
   return res.json();
+}
+
+function updateRateLimitUI(remaining, limit) {
+  const badge = document.getElementById("gh-rate-limit-badge");
+  const remEl = document.getElementById("gh-rate-remaining");
+  const limEl = document.getElementById("gh-rate-limit");
+
+  if (badge && remEl && limEl) {
+    badge.style.display = "inline-block";
+    remEl.textContent = remaining;
+    limEl.textContent = limit;
+
+    if (parseInt(remaining) < 5) {
+      badge.style.background = "rgba(239, 68, 68, 0.15)";
+      badge.style.color = "#ef4444";
+    } else {
+      badge.style.background = "rgba(99, 102, 241, 0.1)";
+      badge.style.color = "#6366f1";
+    }
+  }
 }
 
 function renderRepos(repos) {

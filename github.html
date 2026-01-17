@@ -496,6 +496,10 @@
               <div class="card profile-card" id="gh-profile">
                 <div class="card-header">
                   <h3 data-i18n="nav.profile">Profile</h3>
+                  <div id="gh-rate-limit-badge" class="rate-limit-badge"
+                    style="display:none; font-size: 0.8rem; padding: 2px 8px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                    API: <span id="gh-rate-remaining">--</span>/<span id="gh-rate-limit">--</span>
+                  </div>
                 </div>
                 <div class="card-body">
                   <div class="profile-row">
@@ -515,6 +519,46 @@
                     <div><span id="gh-repos-count">0</span><label data-i18n="dashboard.stats.repositories">Repos</label>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <!-- New PR Metrics Card -->
+              <div class="card pr-card" id="gh-pr-metrics" style="display:none; margin-top: 24px;">
+                <div class="card-header">
+                  <h3>Pull Request Activity</h3>
+                  <div class="muted small">Recent public events</div>
+                </div>
+                <div class="card-body">
+                  <div class="pr-stats-grid"
+                    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                    <div class="pr-stat">
+                      <div class="pr-count" id="pr-opened"
+                        style="font-size: 1.5rem; font-weight: bold; color: #2ecc71;">0</div>
+                      <div class="pr-label" style="font-size: 0.8rem; opacity: 0.8;">Opened</div>
+                    </div>
+                    <div class="pr-stat">
+                      <div class="pr-count" id="pr-merged"
+                        style="font-size: 1.5rem; font-weight: bold; color: #a855f7;">0</div>
+                      <div class="pr-label" style="font-size: 0.8rem; opacity: 0.8;">Merged</div>
+                    </div>
+                    <div class="pr-stat">
+                      <div class="pr-count" id="pr-closed"
+                        style="font-size: 1.5rem; font-weight: bold; color: #e74c3c;">0</div>
+                      <div class="pr-label" style="font-size: 0.8rem; opacity: 0.8;">Closed</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- New Language Breakdown Card -->
+              <div class="card language-card" id="gh-languages" style="display:none; margin-top: 24px;">
+                <div class="card-header">
+                  <h3>Language Breakdown</h3>
+                  <div class="muted small">Based on top repositories</div>
+                </div>
+                <div class="card-body">
+                  <div id="gh-language-list" class="language-list"
+                    style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
               </div>
 
